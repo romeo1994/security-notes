@@ -8,11 +8,12 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:#07080d;color:#e2e8f8;font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.7;display:flex;height:100vh;overflow:hidden}
+html,body{height:100%;margin:0;padding:0;overflow:hidden}
+body{background:#07080d;color:#e2e8f8;font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.7}
 :root{--ac:#a3e635;--ac2:#34d399;--ac3:#f59e0b;--ac4:#c084fc;--ac5:#f43f5e;--bg:#07080d;--bgp:#0b0d10;--bgc:#0e1018;--bgh:#12151f;--bd:#1c2030;--bdb:#252a3e;--t1:#e2e8f8;--t2:#8e9ab8;--td:#404660;--cb:#040508;--glow:rgba(163,230,53,.18)}
 body.ios{--ac:#3b82f6;--ac4:#a78bfa;--glow:rgba(59,130,246,.18);--bgp:#0b0d16;--bgc:#0f1220;--bgh:#141828;--bd:#1c2138;--bdb:#28304e}
-#sb{width:320px;min-width:320px;background:var(--bgp);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;transition:background .3s}
-#main{flex:1;overflow-y:auto;background:var(--bg)}
+#sb{position:fixed;top:0;left:0;bottom:0;width:320px;background:var(--bgp);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;transition:background .3s;z-index:100}
+#main{position:fixed;top:0;left:320px;right:0;bottom:0;overflow-y:scroll;background:var(--bg)}
 #main::-webkit-scrollbar{width:5px}
 #main::-webkit-scrollbar-thumb{background:var(--bdb);border-radius:3px}
 .psw{display:flex;border-bottom:1px solid var(--bd);background:var(--bg);flex-shrink:0}
@@ -531,7 +532,7 @@ hr.divider{border:none;border-top:1px solid var(--bd);margin:26px 0}
   </nav>  </div>
 </aside>
 
-<main id="main" tabindex="-1">
+<main id="main">
   <div class="topbar">
     <div class="bc">
       <span id="bc-plat">Android</span>
@@ -5451,9 +5452,7 @@ function nav(p, id) {
   document.getElementById('prog').style.width = (idx >= 0 ? (idx + 1) / allIds.length * 100 : 0) + '%';
 
   // Scroll top
-  var mainEl = document.getElementById('main');
-  mainEl.scrollTop = 0;
-  mainEl.focus({ preventScroll: true });
+  document.getElementById('main').scrollTop = 0;
 }
 
 function sw(p) { nav(p, 'methodology'); }
