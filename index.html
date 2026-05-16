@@ -531,7 +531,7 @@ hr.divider{border:none;border-top:1px solid var(--bd);margin:26px 0}
   </nav>  </div>
 </aside>
 
-<main id="main">
+<main id="main" tabindex="-1">
   <div class="topbar">
     <div class="bc">
       <span id="bc-plat">Android</span>
@@ -5451,7 +5451,9 @@ function nav(p, id) {
   document.getElementById('prog').style.width = (idx >= 0 ? (idx + 1) / allIds.length * 100 : 0) + '%';
 
   // Scroll top
-  document.getElementById('main').scrollTop = 0;
+  var mainEl = document.getElementById('main');
+  mainEl.scrollTop = 0;
+  mainEl.focus({ preventScroll: true });
 }
 
 function sw(p) { nav(p, 'methodology'); }
@@ -5493,6 +5495,37 @@ function copyPre(btn) {
     setTimeout(function() { btn.textContent = 'copy'; }, 1500);
   });
 }
+
+
+// ── Scroll fix for GitHub Pages / HTTP served files ─────────────────────────
+// Route wheel events to the correct scrollable container
+document.addEventListener('wheel', function(e) {
+  var nav_a = document.getElementById('nav-a');
+  var nav_i = document.getElementById('nav-i');
+  var mainEl = document.getElementById('main');
+  var target = e.target;
+
+  // Walk up the DOM to find if wheel is over a nav scroll or main
+  var inNavA = nav_a.contains(target);
+  var inNavI = nav_i.contains(target);
+
+  if (inNavA) {
+    nav_a.scrollTop += e.deltaY;
+    e.preventDefault();
+  } else if (inNavI) {
+    nav_i.scrollTop += e.deltaY;
+    e.preventDefault();
+  } else {
+    // Default: scroll #main
+    mainEl.scrollTop += e.deltaY;
+    e.preventDefault();
+  }
+}, { passive: false });
+
+// Also fix touch scroll on mobile
+document.addEventListener('touchmove', function(e) {
+  // Allow default touch scroll inside #main and navs
+}, { passive: true });
 
 // Initialise
 nav('a', 'methodology');
