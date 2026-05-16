@@ -3,320 +3,192 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobile PenTest Notebook — Android &amp; iOS</title>
+<title>Mobile PenTest Notebook &mdash; Android &amp; iOS</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ══ RESET ══════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: #07080d;
-  color: #e2e8f8;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  line-height: 1.7;
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* ══ PLATFORM COLOURS ══ (switch via JS) ══ */
-:root {
-  --accent:        #a3e635;
-  --accent-glow:   rgba(163,230,53,0.2);
-  --accent2:       #34d399;
-  --accent3:       #f59e0b;
-  --accent4:       #c084fc;
-  --accent5:       #f43f5e;
-  --bg-deep:       #07080d;
-  --bg-panel:      #0b0d10;
-  --bg-card:       #0e1018;
-  --bg-hover:      #12151f;
-  --border:        #1c2030;
-  --border-bright: #252a3e;
-  --text-primary:  #e2e8f8;
-  --text-secondary:#8e9ab8;
-  --text-dim:      #404660;
-  --code-bg:       #040508;
-}
-body.ios-mode {
-  --accent:        #3b82f6;
-  --accent-glow:   rgba(59,130,246,0.2);
-  --accent2:       #34d399;
-  --accent3:       #f59e0b;
-  --accent4:       #a78bfa;
-  --accent5:       #f43f5e;
-  --bg-panel:      #0b0d16;
-  --bg-card:       #0f1220;
-  --bg-hover:      #141828;
-  --border:        #1c2138;
-  --border-bright: #28304e;
-}
-
-/* ══ SIDEBAR ════════════════════════════════ */
-#sidebar {
-  width: 322px; min-width: 322px;
-  background: var(--bg-panel);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  overflow: hidden; position: relative; z-index: 10;
-  transition: background 0.3s;
-}
-
-/* ── Platform Switcher ── */
-.platform-switcher {
-  display: flex; gap: 0;
-  background: var(--bg-deep);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.plat-btn {
-  flex: 1; padding: 11px 8px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10.5px; font-weight: 700;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  cursor: pointer; border: none; outline: none;
-  background: transparent; color: var(--text-dim);
-  transition: all 0.2s; display: flex; align-items: center;
-  justify-content: center; gap: 7px;
-  border-bottom: 2px solid transparent;
-  position: relative;
-}
-.plat-btn:hover { color: var(--text-secondary); background: var(--bg-hover); }
-.plat-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(255,255,255,0.03); }
-.plat-btn .plat-icon { font-size: 16px; }
-
-/* ── Sidebar Header ── */
-.sidebar-header {
-  padding: 16px 18px 12px; border-bottom: 1px solid var(--border);
-  background: linear-gradient(160deg, var(--bg-panel) 0%, var(--bg-card) 100%);
-  flex-shrink: 0; position: relative; overflow: hidden;
-}
-.sidebar-header::after {
-  content: ''; position: absolute; top: -30px; right: -30px;
-  width: 100px; height: 100px;
-  background: radial-gradient(circle, var(--accent-glow), transparent 70%);
-  pointer-events: none;
-}
-.sidebar-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.logo-icon {
-  width: 38px; height: 38px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; flex-shrink: 0;
-  box-shadow: 0 0 20px var(--accent-glow);
-  transition: all 0.3s;
-}
-.logo-icon.android-logo { background: linear-gradient(135deg, #1e3a1e, #4a7c4e); }
-.logo-icon.ios-logo     { background: linear-gradient(135deg, #1d3a7a, #3b82f6); }
-.sidebar-title { font-family: 'DM Sans',sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); line-height: 1.2; transition: color 0.3s; }
-.sidebar-subtitle { font-size: 10px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
-.sidebar-badge { display: inline-block; background: rgba(255,255,255,0.04); border: 1px solid var(--border-bright); color: var(--accent); font-size: 9px; font-family: 'JetBrains Mono',monospace; letter-spacing: 0.1em; padding: 2px 7px; border-radius: 3px; margin-top: 8px; transition: color 0.3s, border-color 0.3s; }
-
-/* ── Search ── */
-#sidebar-search { padding: 9px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-#sidebar-search input { width: 100%; background: var(--bg-card); border: 1px solid var(--border-bright); color: var(--text-primary); font-family: 'JetBrains Mono',monospace; font-size: 11px; padding: 7px 10px; border-radius: 6px; outline: none; transition: border-color 0.2s; }
-#sidebar-search input:focus { border-color: var(--accent); }
-#sidebar-search input::placeholder { color: var(--text-dim); }
-
-/* ── Nav ── */
-.nav-wrapper { flex: 1; overflow: hidden; position: relative; }
-.nav-scroll { overflow-y: auto; height: 100%; padding: 6px 0 20px; display: none; }
-.nav-scroll.active { display: block; }
-.nav-scroll::-webkit-scrollbar { width: 3px; }
-.nav-scroll::-webkit-scrollbar-track { background: transparent; }
-.nav-scroll::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
-
-.nav-section { margin-bottom: 1px; }
-.nav-section-header { display: flex; align-items: center; gap: 8px; padding: 9px 14px 9px 12px; cursor: pointer; user-select: none; transition: background 0.15s; border-left: 3px solid transparent; }
-.nav-section-header:hover { background: var(--bg-hover); }
-.nav-section-header.active { border-left-color: var(--accent); background: rgba(255,255,255,0.03); }
-.nav-section-icon { width: 22px; height: 22px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
-.icon-meth    { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
-.icon-disc    { background: rgba(163,230,53,0.12); color: var(--accent); }
-.icon-static  { background: rgba(52,211,153,0.12); color: var(--accent2); }
-.icon-dynamic { background: rgba(245,158,11,0.12); color: var(--accent3); }
-.icon-bypass  { background: rgba(192,132,252,0.12); color: var(--accent4); }
-.icon-http    { background: rgba(244,63,94,0.12); color: var(--accent5); }
-body.ios-mode .icon-disc { background: rgba(59,130,246,0.12); color: var(--accent); }
-.nav-section-title { font-family: 'DM Sans',sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; flex: 1; color: var(--text-secondary); }
-.nav-section-count { font-family: 'JetBrains Mono',monospace; font-size: 9px; color: var(--text-dim); background: var(--bg-card); border: 1px solid var(--border); padding: 1px 5px; border-radius: 10px; }
-.nav-section-arrow { color: var(--text-dim); font-size: 9px; transition: transform 0.2s; }
-.nav-section.open .nav-section-arrow { transform: rotate(90deg); }
-.nav-items { display: none; padding: 2px 0; }
-.nav-section.open .nav-items { display: block; }
-.nav-item { display: flex; align-items: center; gap: 8px; padding: 5px 14px 5px 40px; font-size: 11.5px; color: var(--text-secondary); cursor: pointer; transition: all 0.14s; border-left: 3px solid transparent; font-family: 'JetBrains Mono',monospace; line-height: 1.4; }
-.nav-item:hover { color: var(--text-primary); background: var(--bg-hover); }
-.nav-item.active { color: var(--accent); background: rgba(255,255,255,0.03); border-left-color: var(--accent); }
-.nav-item-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; transition: background 0.15s; }
-.nav-item.active .nav-item-dot { background: var(--accent); }
-
-/* ══ MAIN ═══════════════════════════════════ */
-#main { flex: 1; overflow-y: auto; background: var(--bg-deep); }
-#main::-webkit-scrollbar { width: 5px; }
-#main::-webkit-scrollbar-track { background: var(--bg-deep); }
-#main::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
-
-.top-bar { position: sticky; top: 0; z-index: 5; background: rgba(7,8,13,0.94); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding: 11px 36px; display: flex; align-items: center; gap: 14px; }
-.breadcrumb { font-family: 'JetBrains Mono',monospace; font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; flex: 1; }
-.breadcrumb span { color: var(--text-secondary); }
-.breadcrumb .bc-plat { color: var(--accent); font-weight: 700; }
-.breadcrumb .bc-current { color: var(--text-primary); }
-.progress-pill { display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; }
-.progress-label { font-family: 'JetBrains Mono',monospace; font-size: 9px; color: var(--text-dim); }
-.progress-bar { width: 80px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent4)); width: 0%; transition: width 0.3s; }
-
-/* ══ CONTENT SECTIONS ═══════════════════════ */
-.platform-view { display: none; }
-.platform-view.active { display: block; }
-.content-section { display: none; padding: 40px 48px 64px; max-width: 980px; animation: fadeUp 0.2s ease; }
-.content-section.active { display: block; }
-@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-
-/* ══ WELCOME ════════════════════════════════ */
-#welcome {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 82vh; padding: 48px; text-align: center; animation: fadeUp 0.4s ease;
-}
-.welcome-logo { width: 76px; height: 76px; background: linear-gradient(135deg, rgba(163,230,53,0.1), rgba(192,132,252,0.1)); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 34px; margin-bottom: 22px; box-shadow: 0 0 50px rgba(163,230,53,0.06); }
-#welcome h1 { font-family: 'DM Sans',sans-serif; font-weight: 700; font-size: 28px; color: var(--text-primary); margin-bottom: 10px; }
-#welcome h1 .hl { color: var(--accent); }
-#welcome p { max-width: 500px; font-size: 14.5px; color: var(--text-secondary); margin-bottom: 28px; }
-.welcome-platforms { display: flex; gap: 16px; justify-content: center; margin-bottom: 28px; }
-.wp-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 22px; cursor: pointer; transition: all 0.2s; text-align: center; min-width: 130px; }
-.wp-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-.wp-card .wp-icon { font-size: 28px; margin-bottom: 6px; }
-.wp-card .wp-label { font-family: 'JetBrains Mono',monospace; font-size: 11px; color: var(--text-secondary); font-weight: 600; }
-.stats-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-.stat-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 13px 20px; min-width: 90px; text-align: center; }
-.stat-num { font-family: 'DM Sans',sans-serif; font-weight: 700; font-size: 22px; color: var(--accent); }
-.stat-label { font-size: 10px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
-
-/* ══ TYPOGRAPHY ═════════════════════════════ */
-.section-hero { background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-deep) 100%); border: 1px solid var(--border-bright); border-radius: 14px; padding: 28px 32px; margin-bottom: 30px; position: relative; overflow: hidden; }
-.section-hero::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(90deg, var(--accent), var(--accent4), transparent); }
-.section-hero-eyebrow { font-family: 'JetBrains Mono',monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
-.section-hero h1 { font-family: 'DM Sans',sans-serif; font-weight: 700; font-size: 26px; color: var(--text-primary); line-height: 1.25; margin-bottom: 10px; }
-.section-hero-desc { color: var(--text-secondary); font-size: 14px; max-width: 600px; line-height: 1.7; }
-h2 { font-family:'DM Sans',sans-serif; font-weight:700; font-size:18px; color:var(--text-primary); margin:34px 0 12px; display:flex; align-items:center; gap:10px; }
-h2::before { content:'//'; color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:400; }
-h3 { font-family:'DM Sans',sans-serif; font-weight:600; font-size:14px; color:var(--accent2); margin:20px 0 8px; letter-spacing:0.02em; }
-p { color:var(--text-secondary); margin-bottom:11px; font-size:13.5px; line-height:1.75; }
-p strong { color:var(--text-primary); font-weight:600; }
-p em { color:var(--accent3); font-style:normal; }
-ul,ol { padding-left:0; margin-bottom:13px; list-style:none; }
-li { color:var(--text-secondary); font-size:13.5px; padding:3px 0 3px 18px; position:relative; line-height:1.65; }
-li::before { content:'▸'; position:absolute; left:0; color:var(--accent); font-size:9px; top:6px; }
-ol { counter-reset:item; }
-ol li::before { content:counter(item); counter-increment:item; color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; top:4px; }
-
-/* ══ CODE ═══════════════════════════════════ */
-code { font-family:'JetBrains Mono',monospace; font-size:11.5px; background:rgba(255,255,255,0.05); color:#a5f3fc; padding:2px 6px; border-radius:3px; border:1px solid rgba(255,255,255,0.08); }
-pre { background:var(--code-bg); border:1px solid var(--border-bright); border-radius:10px; margin:14px 0; overflow:hidden; }
-.pre-header { display:flex; align-items:center; justify-content:space-between; padding:7px 14px; background:rgba(255,255,255,0.02); border-bottom:1px solid var(--border); }
-.pre-lang { font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--text-dim); letter-spacing:0.1em; text-transform:uppercase; }
-.pre-dots { display:flex; gap:5px; }
-.pre-dot { width:8px; height:8px; border-radius:50%; }
-.dot-r{background:#ff5f57;} .dot-y{background:#febc2e;} .dot-g{background:#28c840;}
-.pre-copy { font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--text-dim); cursor:pointer; padding:3px 8px; border-radius:3px; border:1px solid var(--border); background:transparent; transition:all 0.15s; }
-.pre-copy:hover { color:var(--accent); border-color:var(--accent); }
-pre code { display:block; padding:15px 18px; background:transparent; border:none; color:var(--text-primary); font-size:12px; line-height:1.8; overflow-x:auto; white-space:pre; }
-.kw{color:#c084fc;} .str{color:#86efac;} .cm{color:#475569;font-style:italic;} .fn{color:#7dd3fc;} .num{color:#fdba74;} .op{color:#93c5fd;} .var{color:#fca5a5;} .ty{color:#34d399;}
-
-/* ══ CALLOUTS ═══════════════════════════════ */
-.callout { border-radius:8px; padding:13px 16px; margin:14px 0; display:flex; gap:11px; font-size:13px; line-height:1.65; border:1px solid; }
-.callout-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
-.callout.tip    { background:rgba(163,230,53,0.05);  border-color:rgba(163,230,53,0.2);  color:var(--text-secondary); }
-.callout.warn   { background:rgba(245,158,11,0.05);  border-color:rgba(245,158,11,0.2);  color:var(--text-secondary); }
-.callout.danger { background:rgba(244,63,94,0.05);   border-color:rgba(244,63,94,0.2);   color:var(--text-secondary); }
-.callout.info   { background:rgba(52,211,153,0.05);  border-color:rgba(52,211,153,0.2);  color:var(--text-secondary); }
-body.ios-mode .callout.tip { background:rgba(59,130,246,0.05); border-color:rgba(59,130,246,0.2); }
-.callout-title { font-weight:700; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; display:block; margin-bottom:3px; }
-.callout.tip    .callout-title { color:var(--accent); }
-.callout.warn   .callout-title { color:var(--accent3); }
-.callout.danger .callout-title { color:var(--accent5); }
-.callout.info   .callout-title { color:var(--accent2); }
-
-/* ══ TABLES ═════════════════════════════════ */
-.table-wrap { overflow-x:auto; margin:14px 0; }
-table { width:100%; border-collapse:collapse; font-size:12.5px; font-family:'JetBrains Mono',monospace; }
-thead tr { background:var(--bg-card); border-bottom:2px solid var(--accent); }
-thead th { padding:9px 13px; text-align:left; color:var(--accent); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; font-weight:500; }
-tbody tr { border-bottom:1px solid var(--border); transition:background 0.1s; }
-tbody tr:hover { background:var(--bg-hover); }
-tbody td { padding:8px 13px; color:var(--text-secondary); vertical-align:top; }
-tbody td:first-child { color:var(--text-primary); }
-
-/* ══ MISC ═══════════════════════════════════ */
-.tags { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
-.tag { font-family:'JetBrains Mono',monospace; font-size:9.5px; padding:2px 8px; border-radius:3px; letter-spacing:0.05em; border:1px solid; }
-.tag-blue   { color:#60a5fa; border-color:rgba(96,165,250,0.3);  background:rgba(96,165,250,0.07); }
-.tag-green  { color:#34d399; border-color:rgba(52,211,153,0.3);  background:rgba(52,211,153,0.07); }
-.tag-orange { color:#f59e0b; border-color:rgba(245,158,11,0.3);  background:rgba(245,158,11,0.07); }
-.tag-red    { color:#f43f5e; border-color:rgba(244,63,94,0.3);   background:rgba(244,63,94,0.07); }
-.tag-purple { color:#c084fc; border-color:rgba(192,132,252,0.3); background:rgba(192,132,252,0.07); }
-.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0; }
-.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:11px; margin:14px 0; }
-.mini-card { background:var(--bg-card); border:1px solid var(--border); border-radius:9px; padding:14px 15px; transition:border-color 0.2s; }
-.mini-card:hover { border-color:var(--border-bright); }
-.mini-card-title { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--accent); font-weight:500; margin-bottom:6px; }
-.mini-card p { font-size:12.5px; margin:0; }
-.step-flow { margin:14px 0; }
-.step { display:flex; gap:13px; padding:11px 0; border-left:2px solid var(--border); margin-left:14px; padding-left:18px; position:relative; }
-.step::before { content:''; position:absolute; left:-6px; top:15px; width:10px; height:10px; background:var(--bg-deep); border:2px solid var(--accent); border-radius:50%; }
-.step:last-child { border-color:transparent; }
-.step-num { font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--accent); font-weight:700; flex-shrink:0; margin-top:1px; }
-.step-content { flex:1; }
-.step-title { font-weight:600; color:var(--text-primary); font-size:13.5px; margin-bottom:3px; }
-.step-desc { font-size:12.5px; color:var(--text-secondary); }
-hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
-.plist-key{color:#fca5a5;} .plist-val{color:#86efac;} .plist-tag{color:#94a3b8;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#07080d;color:#e2e8f8;font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.7;display:flex;height:100vh;overflow:hidden}
+:root{--ac:#a3e635;--ac2:#34d399;--ac3:#f59e0b;--ac4:#c084fc;--ac5:#f43f5e;--bg:#07080d;--bgp:#0b0d10;--bgc:#0e1018;--bgh:#12151f;--bd:#1c2030;--bdb:#252a3e;--t1:#e2e8f8;--t2:#8e9ab8;--td:#404660;--cb:#040508;--glow:rgba(163,230,53,.18)}
+body.ios{--ac:#3b82f6;--ac4:#a78bfa;--glow:rgba(59,130,246,.18);--bgp:#0b0d16;--bgc:#0f1220;--bgh:#141828;--bd:#1c2138;--bdb:#28304e}
+#sb{width:320px;min-width:320px;background:var(--bgp);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;transition:background .3s}
+#main{flex:1;overflow-y:auto;background:var(--bg)}
+#main::-webkit-scrollbar{width:5px}
+#main::-webkit-scrollbar-thumb{background:var(--bdb);border-radius:3px}
+.psw{display:flex;border-bottom:1px solid var(--bd);background:var(--bg);flex-shrink:0}
+.pb{flex:1;padding:11px 8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--td);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;border-bottom:2px solid transparent}
+.pb:hover{color:var(--t2);background:var(--bgh)}
+.pb.on{color:var(--ac);border-bottom-color:var(--ac);background:rgba(255,255,255,.03)}
+.pi{font-size:16px}
+.sbh{padding:16px 18px 12px;border-bottom:1px solid var(--bd);flex-shrink:0;background:linear-gradient(160deg,var(--bgp),var(--bgc));position:relative;overflow:hidden}
+.sbh::after{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:radial-gradient(circle,var(--glow),transparent 70%);pointer-events:none}
+.sbl{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.li{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 0 20px var(--glow);transition:all .3s}
+.li.al{background:linear-gradient(135deg,#1e3a1e,#4a7c4e)}
+.li.il{background:linear-gradient(135deg,#1d3a7a,#3b82f6)}
+#sb-title{font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ac);line-height:1.2;transition:color .3s}
+#sb-sub{font-size:10px;color:var(--td);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+#sb-badge{display:inline-block;background:rgba(255,255,255,.04);border:1px solid var(--bdb);color:var(--ac);font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;padding:2px 7px;border-radius:3px;margin-top:8px;transition:color .3s}
+.sbs{padding:9px 12px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.sbs input{width:100%;background:var(--bgc);border:1px solid var(--bdb);color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:11px;padding:7px 10px;border-radius:6px;outline:none;transition:border-color .2s}
+.sbs input:focus{border-color:var(--ac)}
+.sbs input::placeholder{color:var(--td)}
+.nw{flex:1;overflow:hidden;position:relative}
+.nav-scroll{overflow-y:auto;height:100%;padding:6px 0 20px;display:none}
+.nav-scroll.on{display:block}
+.nav-scroll::-webkit-scrollbar{width:3px}
+.nav-scroll::-webkit-scrollbar-thumb{background:var(--bdb);border-radius:2px}
+.nav-section{margin-bottom:1px}
+.nav-section-header{display:flex;align-items:center;gap:8px;padding:9px 14px 9px 12px;cursor:pointer;user-select:none;transition:background .15s;border-left:3px solid transparent}
+.nav-section-header:hover{background:var(--bgh)}
+.nav-section-header.on{border-left-color:var(--ac);background:rgba(255,255,255,.03)}
+.nav-section-icon{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.icon-meth{background:rgba(255,255,255,.06);color:var(--t2)}
+.icon-disc{background:rgba(163,230,53,.12);color:var(--ac)}
+.icon-static{background:rgba(52,211,153,.12);color:var(--ac2)}
+.icon-dynamic{background:rgba(245,158,11,.12);color:var(--ac3)}
+.icon-bypass{background:rgba(192,132,252,.12);color:var(--ac4)}
+.icon-http{background:rgba(244,63,94,.12);color:var(--ac5)}
+body.ios .icon-disc{background:rgba(59,130,246,.12)}
+.nav-section-title{font-family:'DM Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:.07em;text-transform:uppercase;flex:1;color:var(--t2)}
+.nav-section-count{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);background:var(--bgc);border:1px solid var(--bd);padding:1px 5px;border-radius:10px}
+.nav-section-arrow{color:var(--td);font-size:9px;transition:transform .2s}
+.nav-section.open .nav-section-arrow{transform:rotate(90deg)}
+.nav-items{display:none;padding:2px 0}
+.nav-section.open .nav-items{display:block}
+.nav-item{display:flex;align-items:center;gap:8px;padding:5px 14px 5px 40px;font-size:11.5px;color:var(--t2);cursor:pointer;transition:all .14s;border-left:3px solid transparent;font-family:'JetBrains Mono',monospace;line-height:1.4}
+.nav-item:hover{color:var(--t1);background:var(--bgh)}
+.nav-item.on{color:var(--ac);background:rgba(255,255,255,.03);border-left-color:var(--ac)}
+.nav-item-dot{width:4px;height:4px;border-radius:50%;background:var(--td);flex-shrink:0;transition:background .15s}
+.nav-item.on .nav-item-dot{background:var(--ac)}
+.topbar{position:sticky;top:0;z-index:5;background:rgba(7,8,13,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd);padding:11px 36px;display:flex;align-items:center;gap:14px}
+.bc{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);display:flex;align-items:center;gap:6px;flex:1}
+.bc span{color:var(--t2)}
+#bc-plat{color:var(--ac);font-weight:700}
+#bc-cur{color:var(--t1)}
+.pp{display:flex;align-items:center;gap:8px;background:var(--bgc);border:1px solid var(--bd);border-radius:20px;padding:4px 10px}
+.pp-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)}
+.pp-bar{width:80px;height:3px;background:var(--bd);border-radius:2px;overflow:hidden}
+#prog{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac4));width:0%;transition:width .3s}
+#welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:82vh;padding:48px;text-align:center}
+.wl{width:76px;height:76px;background:linear-gradient(135deg,rgba(163,230,53,.1),rgba(192,132,252,.1));border:1px solid rgba(255,255,255,.08);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:22px}
+#welcome h1{font-family:'DM Sans',sans-serif;font-weight:700;font-size:28px;margin-bottom:10px}
+#welcome h1 span{color:var(--ac)}
+#welcome p{max-width:500px;font-size:14.5px;color:var(--t2);margin-bottom:28px}
+.wp-row{display:flex;gap:16px;justify-content:center;margin-bottom:28px}
+.wpc{background:var(--bgc);border:1px solid var(--bd);border-radius:12px;padding:16px 22px;cursor:pointer;transition:all .2s;text-align:center;min-width:130px}
+.wpc:hover{border-color:var(--ac);transform:translateY(-2px)}
+.wpi{font-size:28px;margin-bottom:6px}
+.wpl{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);font-weight:600}
+.sr{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.si{background:var(--bgc);border:1px solid var(--bd);border-radius:10px;padding:13px 20px;min-width:90px;text-align:center}
+.sn{font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;color:var(--ac)}
+.sl{font-size:10px;color:var(--td);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+/* CRITICAL: platform view and content section visibility */
+.pv{display:none}
+.pv.on{display:block}
+.content-section{display:none;padding:40px 48px 64px;max-width:980px;animation:fu .2s ease}
+.content-section.on{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-hero{background:linear-gradient(135deg,var(--bgc),var(--bg));border:1px solid var(--bdb);border-radius:14px;padding:28px 32px;margin-bottom:30px;position:relative;overflow:hidden}
+.section-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ac),var(--ac4),transparent)}
+.section-hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.section-hero h1{font-family:'DM Sans',sans-serif;font-weight:700;font-size:26px;color:var(--t1);line-height:1.25;margin-bottom:10px}
+.section-hero-desc{color:var(--t2);font-size:14px;max-width:600px;line-height:1.7}
+h2{font-family:'DM Sans',sans-serif;font-weight:700;font-size:18px;color:var(--t1);margin:34px 0 12px;display:flex;align-items:center;gap:10px}
+h2::before{content:'//';color:var(--ac);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:400}
+h3{font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;color:var(--ac2);margin:20px 0 8px}
+p{color:var(--t2);margin-bottom:11px;font-size:13.5px;line-height:1.75}
+p strong{color:var(--t1);font-weight:600}
+p em{color:var(--ac3);font-style:normal}
+ul,ol{padding-left:0;margin-bottom:13px;list-style:none}
+li{color:var(--t2);font-size:13.5px;padding:3px 0 3px 18px;position:relative;line-height:1.65}
+li::before{content:'\25B8';position:absolute;left:0;color:var(--ac);font-size:9px;top:6px}
+ol{counter-reset:item}
+ol li::before{content:counter(item);counter-increment:item;color:var(--ac);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;top:4px}
+code{font-family:'JetBrains Mono',monospace;font-size:11.5px;background:rgba(255,255,255,.05);color:#a5f3fc;padding:2px 6px;border-radius:3px;border:1px solid rgba(255,255,255,.08)}
+pre{background:var(--cb);border:1px solid var(--bdb);border-radius:10px;margin:14px 0;overflow:hidden}
+.pre-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--bd)}
+.pre-lang{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--td);letter-spacing:.1em;text-transform:uppercase}
+.pre-dots{display:flex;gap:5px}
+.pre-dot{width:8px;height:8px;border-radius:50%}
+.dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+.pre-copy{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--td);cursor:pointer;padding:3px 8px;border-radius:3px;border:1px solid var(--bd);background:transparent;transition:all .15s}
+.pre-copy:hover{color:var(--ac);border-color:var(--ac)}
+pre code{display:block;padding:15px 18px;background:transparent;border:none;color:var(--t1);font-size:12px;line-height:1.8;overflow-x:auto;white-space:pre}
+.kw{color:#c084fc}.str{color:#86efac}.cm{color:#475569;font-style:italic}.fn{color:#7dd3fc}.num{color:#fdba74}.op{color:#93c5fd}.var{color:#fca5a5}.ty{color:#34d399}
+.plist-key{color:#fca5a5}.plist-val{color:#86efac}.plist-tag{color:#94a3b8}
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;display:flex;gap:11px;font-size:13px;line-height:1.65;border:1px solid}
+.callout-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.callout.tip{background:rgba(163,230,53,.05);border-color:rgba(163,230,53,.2);color:var(--t2)}
+.callout.warn{background:rgba(245,158,11,.05);border-color:rgba(245,158,11,.2);color:var(--t2)}
+.callout.danger{background:rgba(244,63,94,.05);border-color:rgba(244,63,94,.2);color:var(--t2)}
+.callout.info{background:rgba(52,211,153,.05);border-color:rgba(52,211,153,.2);color:var(--t2)}
+body.ios .callout.tip{background:rgba(59,130,246,.05);border-color:rgba(59,130,246,.2)}
+.callout-title{font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:3px}
+.callout.tip .callout-title{color:var(--ac)}
+.callout.warn .callout-title{color:var(--ac3)}
+.callout.danger .callout-title{color:var(--ac5)}
+.callout.info .callout-title{color:var(--ac2)}
+.table-wrap{overflow-x:auto;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:12.5px;font-family:'JetBrains Mono',monospace}
+thead tr{background:var(--bgc);border-bottom:2px solid var(--ac)}
+thead th{padding:9px 13px;text-align:left;color:var(--ac);font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+tbody tr{border-bottom:1px solid var(--bd);transition:background .1s}
+tbody tr:hover{background:var(--bgh)}
+tbody td{padding:8px 13px;color:var(--t2);vertical-align:top}
+tbody td:first-child{color:var(--t1)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font-family:'JetBrains Mono',monospace;font-size:9.5px;padding:2px 8px;border-radius:3px;letter-spacing:.05em;border:1px solid}
+.tag-blue{color:#60a5fa;border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.07)}
+.tag-green{color:#34d399;border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.07)}
+.tag-orange{color:#f59e0b;border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.07)}
+.tag-red{color:#f43f5e;border-color:rgba(244,63,94,.3);background:rgba(244,63,94,.07)}
+.tag-purple{color:#c084fc;border-color:rgba(192,132,252,.3);background:rgba(192,132,252,.07)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin:14px 0}
+.mini-card{background:var(--bgc);border:1px solid var(--bd);border-radius:9px;padding:14px 15px;transition:border-color .2s}
+.mini-card:hover{border-color:var(--bdb)}
+.mini-card-title{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ac);font-weight:500;margin-bottom:6px}
+.mini-card p{font-size:12.5px;margin:0}
+.step-flow{margin:14px 0}
+.step{display:flex;gap:13px;padding:11px 0;border-left:2px solid var(--bd);margin-left:14px;padding-left:18px;position:relative}
+.step::before{content:'';position:absolute;left:-6px;top:15px;width:10px;height:10px;background:var(--bg);border:2px solid var(--ac);border-radius:50%}
+.step:last-child{border-color:transparent}
+.step-num{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--ac);font-weight:700;flex-shrink:0;margin-top:1px}
+.step-content{flex:1}
+.step-title{font-weight:600;color:var(--t1);font-size:13.5px;margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--t2)}
+hr.divider{border:none;border-top:1px solid var(--bd);margin:26px 0}
 </style>
 </head>
 <body>
 
-<!-- ═══ SIDEBAR ══════════════════════════════ -->
-<aside id="sidebar">
-
-  <!-- Platform Switcher -->
-  <div class="platform-switcher">
-    <button class="plat-btn active" id="btn-android" onclick="switchPlatform('android')">
-      <span class="plat-icon">🤖</span> Android
-    </button>
-    <button class="plat-btn" id="btn-ios" onclick="switchPlatform('ios')">
-      <span class="plat-icon">🍎</span> iOS
-    </button>
+<aside id="sb">
+  <div class="psw">
+    <button class="pb on" id="btn-a" onclick="sw('a')"><span class="pi">&#129302;</span> Android</button>
+    <button class="pb" id="btn-i" onclick="sw('i')"><span class="pi">&#127822;</span> iOS</button>
   </div>
-
-  <!-- Dynamic header -->
-  <div class="sidebar-header">
-    <div class="sidebar-logo">
-      <div class="logo-icon android-logo" id="sidebar-logo-icon">🤖</div>
-      <div>
-        <div class="sidebar-title" id="sidebar-title">PenTest<br>Notebook</div>
-      </div>
+  <div class="sbh">
+    <div class="sbl">
+      <div class="li al" id="li">&#129302;</div>
+      <div><div id="sb-title">PenTest<br>Notebook</div></div>
     </div>
-    <div class="sidebar-subtitle" id="sidebar-subtitle">Mobile Security · Android Edition</div>
-    <div class="sidebar-badge" id="sidebar-badge">v1.0 · Android · 31 Topics</div>
+    <div id="sb-sub">Mobile Security &middot; Android Edition</div>
+    <div id="sb-badge">v1.0 &middot; Android &middot; 32 Topics</div>
   </div>
-
-  <div id="sidebar-search">
-    <input type="text" placeholder="Search topics..." oninput="filterNav(this.value)" id="search-input"/>
-  </div>
-
-  <div class="nav-wrapper">
-    <!-- ANDROID NAV -->
-    <nav class="nav-scroll active" id="and-nav-root">
-    <!-- METHODOLOGY -->
-    <div class="nav-section open" data-section="methodology">
-      <div class="nav-section-header active" onclick="toggleSection(this, 'and')">
-        <div class="nav-section-icon icon-meth">📋</div>
+  <div class="sbs"><input type="text" placeholder="Search topics..." oninput="search(this.value)"/></div>
+  <div class="nw">
+<nav class="nav-scroll on" id="nav-a">
+    <div class="nav-section open">
+      <div class="nav-section-header" onclick="tog(this,'a')">
+        <div class="nav-section-icon icon-meth">&#128203;</div>
         <span class="nav-section-title">Methodology</span>
         <span class="nav-section-count">1</span>
-        <span class="nav-section-arrow">▶</span>
+        <span class="nav-section-arrow">&#9654;</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item active" onclick="showPage('and','methodology')" data-keywords="methodology phases checklist owasp masvs mastg">
+        <div class="nav-item" onclick="nav('a','methodology')" data-keywords="methodology phases checklist owasp masvs mastg">
           <div class="nav-item-dot"></div>Testing Methodology
         </div>
       </div>
@@ -324,31 +196,31 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
 
     <!-- APP DISCOVERY -->
     <div class="nav-section open" data-section="discovery">
-      <div class="nav-section-header active" onclick="toggleSection(this,'and')">
+      <div class="nav-section-header" onclick="tog(this,'a')">
         <div class="nav-section-icon icon-disc">🔍</div>
         <span class="nav-section-title">App Discovery</span>
         <span class="nav-section-arrow">▶</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item active" onclick="showPage('and','android-api')" data-keywords="api version sdk level">
+        <div class="nav-item" onclick="nav('a','android-api')" data-keywords="api version sdk level">
           <div class="nav-item-dot"></div>Android API Versions
         </div>
-        <div class="nav-item" onclick="showPage('and','app-arch')" data-keywords="architecture dalvik art">
+        <div class="nav-item" onclick="nav('a','app-arch')" data-keywords="architecture dalvik art">
           <div class="nav-item-dot"></div>App Architecture
         </div>
-        <div class="nav-item" onclick="showPage('and','adb')" data-keywords="adb debug bridge shell">
+        <div class="nav-item" onclick="nav('a','adb')" data-keywords="adb debug bridge shell">
           <div class="nav-item-dot"></div>Android Debug Bridge (ADB)
         </div>
-        <div class="nav-item" onclick="showPage('and','permissions')" data-keywords="permissions dangerous manifest">
+        <div class="nav-item" onclick="nav('a','permissions')" data-keywords="permissions dangerous manifest">
           <div class="nav-item-dot"></div>App Permissions
         </div>
-        <div class="nav-item" onclick="showPage('and','app-types')" data-keywords="native hybrid webview">
+        <div class="nav-item" onclick="nav('a','app-types')" data-keywords="native hybrid webview">
           <div class="nav-item-dot"></div>Android App Types
         </div>
-        <div class="nav-item" onclick="showPage('and','app-components')" data-keywords="activity service receiver provider">
+        <div class="nav-item" onclick="nav('a','app-components')" data-keywords="activity service receiver provider">
           <div class="nav-item-dot"></div>App Components
         </div>
-        <div class="nav-item" onclick="showPage('and','directories')" data-keywords="data directory storage files">
+        <div class="nav-item" onclick="nav('a','directories')" data-keywords="data directory storage files">
           <div class="nav-item-dot"></div>Device App Directories
         </div>
       </div>
@@ -356,31 +228,31 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
 
     <!-- STATIC ANALYSIS -->
     <div class="nav-section" data-section="static">
-      <div class="nav-section-header" onclick="toggleSection(this,'and')">
+      <div class="nav-section-header" onclick="tog(this,'a')">
         <div class="nav-section-icon icon-static">📦</div>
         <span class="nav-section-title">Static Analysis</span>
         <span class="nav-section-arrow">▶</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item" onclick="showPage('and','decompile')" data-keywords="apk decompile jadx apktool dex2jar">
+        <div class="nav-item" onclick="nav('a','decompile')" data-keywords="apk decompile jadx apktool dex2jar">
           <div class="nav-item-dot"></div>Decode &amp; Decompile APK
         </div>
-        <div class="nav-item" onclick="showPage('and','binary-prot')" data-keywords="obfuscation proguard binary protection">
+        <div class="nav-item" onclick="nav('a','binary-prot')" data-keywords="obfuscation proguard binary protection">
           <div class="nav-item-dot"></div>Binary Protections
         </div>
-        <div class="nav-item" onclick="showPage('and','hardcoded-apk')" data-keywords="hardcoded secrets api key apk">
+        <div class="nav-item" onclick="nav('a','hardcoded-apk')" data-keywords="hardcoded secrets api key apk">
           <div class="nav-item-dot"></div>HardCoded Data / APK
         </div>
-        <div class="nav-item" onclick="showPage('and','hardcoded-dev')" data-keywords="hardcoded device on-device">
+        <div class="nav-item" onclick="nav('a','hardcoded-dev')" data-keywords="hardcoded device on-device">
           <div class="nav-item-dot"></div>HardCoded Data / On Device
         </div>
-        <div class="nav-item" onclick="showPage('and','thirdparty')" data-keywords="third party library framework sdk">
+        <div class="nav-item" onclick="nav('a','thirdparty')" data-keywords="third party library framework sdk">
           <div class="nav-item-dot"></div>3rd Party Libraries
         </div>
-        <div class="nav-item" onclick="showPage('and','endpoints')" data-keywords="endpoint url api discovery">
+        <div class="nav-item" onclick="nav('a','endpoints')" data-keywords="endpoint url api discovery">
           <div class="nav-item-dot"></div>Endpoint Discovery &amp; URLs
         </div>
-        <div class="nav-item" onclick="showPage('and','mobsf')" data-keywords="mobsf mobile security framework">
+        <div class="nav-item" onclick="nav('a','mobsf')" data-keywords="mobsf mobile security framework">
           <div class="nav-item-dot"></div>MobSF for Android
         </div>
       </div>
@@ -388,49 +260,49 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
 
     <!-- DYNAMIC ANALYSIS -->
     <div class="nav-section" data-section="dynamic">
-      <div class="nav-section-header" onclick="toggleSection(this,'and')">
+      <div class="nav-section-header" onclick="tog(this,'a')">
         <div class="nav-section-icon icon-dynamic">⚡</div>
         <span class="nav-section-title">Dynamic Analysis</span>
         <span class="nav-section-arrow">▶</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item" onclick="showPage('and','drozer')" data-keywords="drozer sieve exploit">
+        <div class="nav-item" onclick="nav('a','drozer')" data-keywords="drozer sieve exploit">
           <div class="nav-item-dot"></div>Drozer
         </div>
-        <div class="nav-item" onclick="showPage('and','keyboard-cache')" data-keywords="keyboard cache autocomplete">
+        <div class="nav-item" onclick="nav('a','keyboard-cache')" data-keywords="keyboard cache autocomplete">
           <div class="nav-item-dot"></div>Keyboard Cache
         </div>
-        <div class="nav-item" onclick="showPage('and','syslogs')" data-keywords="logcat system logs">
+        <div class="nav-item" onclick="nav('a','syslogs')" data-keywords="logcat system logs">
           <div class="nav-item-dot"></div>System Logs
         </div>
-        <div class="nav-item" onclick="showPage('and','backup')" data-keywords="backup adb extract">
+        <div class="nav-item" onclick="nav('a','backup')" data-keywords="backup adb extract">
           <div class="nav-item-dot"></div>App Backup
         </div>
-        <div class="nav-item" onclick="showPage('and','memdumps')" data-keywords="memory dump frida">
+        <div class="nav-item" onclick="nav('a','memdumps')" data-keywords="memory dump frida">
           <div class="nav-item-dot"></div>Memory Dumps
         </div>
-        <div class="nav-item" onclick="showPage('and','fs-monitor')" data-keywords="filesystem monitor inotify">
+        <div class="nav-item" onclick="nav('a','fs-monitor')" data-keywords="filesystem monitor inotify">
           <div class="nav-item-dot"></div>Filesystem Monitoring
         </div>
-        <div class="nav-item" onclick="showPage('and','crypto-monitor')" data-keywords="crypto frida hook monitor">
+        <div class="nav-item" onclick="nav('a','crypto-monitor')" data-keywords="crypto frida hook monitor">
           <div class="nav-item-dot"></div>Monitor Crypto Functions
         </div>
-        <div class="nav-item" onclick="showPage('and','keystore')" data-keywords="keystore android hardware">
+        <div class="nav-item" onclick="nav('a','keystore')" data-keywords="keystore android hardware">
           <div class="nav-item-dot"></div>Android Keystore Monitor
         </div>
-        <div class="nav-item" onclick="showPage('and','cookies')" data-keywords="session cookies webview">
+        <div class="nav-item" onclick="nav('a','cookies')" data-keywords="session cookies webview">
           <div class="nav-item-dot"></div>Session Cookies
         </div>
-        <div class="nav-item" onclick="showPage('and','local-server')" data-keywords="local server port">
+        <div class="nav-item" onclick="nav('a','local-server')" data-keywords="local server port">
           <div class="nav-item-dot"></div>Local Server
         </div>
-        <div class="nav-item" onclick="showPage('and','shared-prefs')" data-keywords="shared preferences xml">
+        <div class="nav-item" onclick="nav('a','shared-prefs')" data-keywords="shared preferences xml">
           <div class="nav-item-dot"></div>Shared Preferences
         </div>
-        <div class="nav-item" onclick="showPage('and','enc-prefs')" data-keywords="encrypted shared preferences">
+        <div class="nav-item" onclick="nav('a','enc-prefs')" data-keywords="encrypted shared preferences">
           <div class="nav-item-dot"></div>Encrypted Shared Prefs
         </div>
-        <div class="nav-item" onclick="showPage('and','biometric')" data-keywords="biometric fingerprint bypass">
+        <div class="nav-item" onclick="nav('a','biometric')" data-keywords="biometric fingerprint bypass">
           <div class="nav-item-dot"></div>Biometric Testing
         </div>
       </div>
@@ -438,16 +310,16 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
 
     <!-- BYPASSES -->
     <div class="nav-section" data-section="bypass">
-      <div class="nav-section-header" onclick="toggleSection(this,'and')">
+      <div class="nav-section-header" onclick="tog(this,'a')">
         <div class="nav-section-icon icon-bypass">🛡️</div>
         <span class="nav-section-title">Bypasses</span>
         <span class="nav-section-arrow">▶</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item" onclick="showPage('and','ssl-pinning')" data-keywords="ssl pinning bypass certificate">
+        <div class="nav-item" onclick="nav('a','ssl-pinning')" data-keywords="ssl pinning bypass certificate">
           <div class="nav-item-dot"></div>SSL Pinning Bypass
         </div>
-        <div class="nav-item" onclick="showPage('and','root-detect')" data-keywords="root detection bypass magisk">
+        <div class="nav-item" onclick="nav('a','root-detect')" data-keywords="root detection bypass magisk">
           <div class="nav-item-dot"></div>Bypass Root Detection
         </div>
       </div>
@@ -455,35 +327,31 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
 
     <!-- HTTP TRAFFIC -->
     <div class="nav-section" data-section="http">
-      <div class="nav-section-header" onclick="toggleSection(this,'and')">
+      <div class="nav-section-header" onclick="tog(this,'a')">
         <div class="nav-section-icon icon-http">🌐</div>
         <span class="nav-section-title">HTTP Traffic</span>
         <span class="nav-section-arrow">▶</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item" onclick="showPage('and','proxy')" data-keywords="proxy burp intercept">
+        <div class="nav-item" onclick="nav('a','proxy')" data-keywords="proxy burp intercept">
           <div class="nav-item-dot"></div>Configure Intercept Proxy
         </div>
-        <div class="nav-item" onclick="showPage('and','web-backend')" data-keywords="web backend api testing">
+        <div class="nav-item" onclick="nav('a','web-backend')" data-keywords="web backend api testing">
           <div class="nav-item-dot"></div>Web App Backend Testing
         </div>
       </div>
     </div>
 
-  </nav>
-
-    <!-- iOS NAV -->
-    <nav class="nav-scroll" id="ios-nav-root">
-    <!-- METHODOLOGY -->
-    <div class="nav-section open" data-section="methodology">
-      <div class="nav-section-header active" onclick="toggleSection(this, 'ios')">
-        <div class="nav-section-icon icon-meth">📋</div>
+  </nav><nav class="nav-scroll" id="nav-i">
+    <div class="nav-section open">
+      <div class="nav-section-header" onclick="tog(this,'i')">
+        <div class="nav-section-icon icon-meth">&#128203;</div>
         <span class="nav-section-title">Methodology</span>
         <span class="nav-section-count">1</span>
-        <span class="nav-section-arrow">▶</span>
+        <span class="nav-section-arrow">&#9654;</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item active" onclick="showPage('ios','methodology')" data-keywords="methodology phases checklist owasp masvs mastg">
+        <div class="nav-item" onclick="nav('i','methodology')" data-keywords="methodology phases checklist owasp masvs mastg">
           <div class="nav-item-dot"></div>Testing Methodology
         </div>
       </div>
@@ -491,26 +359,26 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
 
     <!-- APP DISCOVERY -->
     <div class="nav-section open" data-section="discovery">
-      <div class="nav-section-header active" onclick="toggleSection(this,'ios')">
+      <div class="nav-section-header" onclick="tog(this,'i')">
         <div class="nav-section-icon icon-disc">🔍</div>
         <span class="nav-section-title">App Discovery</span>
         <span class="nav-section-count">5</span>
         <span class="nav-section-arrow">▶</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item active" onclick="showPage('ios','app-install')" data-keywords="install ipa sideload testflight">
+        <div class="nav-item" onclick="nav('i','app-install')" data-keywords="install ipa sideload testflight">
           <div class="nav-item-dot"></div>App Installation
         </div>
-        <div class="nav-item" onclick="showPage('ios','app-env')" data-keywords="environment sandbox container data">
+        <div class="nav-item" onclick="nav('i','app-env')" data-keywords="environment sandbox container data">
           <div class="nav-item-dot"></div>App Environment
         </div>
-        <div class="nav-item" onclick="showPage('ios','decrypt-app')" data-keywords="decrypt clutch frida-ios-dump bfdecrypt">
+        <div class="nav-item" onclick="nav('i','decrypt-app')" data-keywords="decrypt clutch frida-ios-dump bfdecrypt">
           <div class="nav-item-dot"></div>Decrypt App
         </div>
-        <div class="nav-item" onclick="showPage('ios','ios-app-types')" data-keywords="native swift objc react native flutter cordova">
+        <div class="nav-item" onclick="nav('i','ios-app-types')" data-keywords="native swift objc react native flutter cordova">
           <div class="nav-item-dot"></div>iOS App Types
         </div>
-        <div class="nav-item" onclick="showPage('ios','ios-perms')" data-keywords="permissions tcc info.plist privacy">
+        <div class="nav-item" onclick="nav('i','ios-perms')" data-keywords="permissions tcc info.plist privacy">
           <div class="nav-item-dot"></div>App Permissions
         </div>
       </div>
@@ -518,32 +386,32 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
 
     <!-- STATIC ANALYSIS -->
     <div class="nav-section" data-section="static">
-      <div class="nav-section-header" onclick="toggleSection(this,'ios')">
+      <div class="nav-section-header" onclick="tog(this,'i')">
         <div class="nav-section-icon icon-static">📦</div>
         <span class="nav-section-title">Static Analysis</span>
         <span class="nav-section-count">7</span>
         <span class="nav-section-arrow">▶</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item" onclick="showPage('ios','extract-ipa')" data-keywords="ipa extract decode otool class-dump">
+        <div class="nav-item" onclick="nav('i','extract-ipa')" data-keywords="ipa extract decode otool class-dump">
           <div class="nav-item-dot"></div>Extract &amp; Decode IPA
         </div>
-        <div class="nav-item" onclick="showPage('ios','binary-prot')" data-keywords="pie stack canary arc bitcode encryption">
+        <div class="nav-item" onclick="nav('i','binary-prot')" data-keywords="pie stack canary arc bitcode encryption">
           <div class="nav-item-dot"></div>Binary Protections
         </div>
-        <div class="nav-item" onclick="showPage('ios','data-prot-static')" data-keywords="data protection class nSFileProtection">
+        <div class="nav-item" onclick="nav('i','data-prot-static')" data-keywords="data protection class nSFileProtection">
           <div class="nav-item-dot"></div>Data Protection Classes
         </div>
-        <div class="nav-item" onclick="showPage('ios','header-files')" data-keywords="header files class-dump objection">
+        <div class="nav-item" onclick="nav('i','header-files')" data-keywords="header files class-dump objection">
           <div class="nav-item-dot"></div>Evaluate Header Files
         </div>
-        <div class="nav-item" onclick="showPage('ios','endpoint-disc')" data-keywords="endpoint url api strings grep">
+        <div class="nav-item" onclick="nav('i','endpoint-disc')" data-keywords="endpoint url api strings grep">
           <div class="nav-item-dot"></div>Endpoint &amp; URL Discovery
         </div>
-        <div class="nav-item" onclick="showPage('ios','hardcoded-static')" data-keywords="hardcoded config info.plist strings">
+        <div class="nav-item" onclick="nav('i','hardcoded-static')" data-keywords="hardcoded config info.plist strings">
           <div class="nav-item-dot"></div>App Config / Hard-Coded Data
         </div>
-        <div class="nav-item" onclick="showPage('ios','thirdparty')" data-keywords="third party library frameworks cocoapods carthage">
+        <div class="nav-item" onclick="nav('i','thirdparty')" data-keywords="third party library frameworks cocoapods carthage">
           <div class="nav-item-dot"></div>3rd Party Libraries
         </div>
       </div>
@@ -551,71 +419,71 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
 
     <!-- DYNAMIC ANALYSIS -->
     <div class="nav-section" data-section="dynamic">
-      <div class="nav-section-header" onclick="toggleSection(this,'ios')">
+      <div class="nav-section-header" onclick="tog(this,'i')">
         <div class="nav-section-icon icon-dynamic">⚡</div>
         <span class="nav-section-title">Dynamic Analysis</span>
         <span class="nav-section-count">20</span>
         <span class="nav-section-arrow">▶</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item" onclick="showPage('ios','tls')" data-keywords="tls ats nsallowsarbitraryloads transport">
+        <div class="nav-item" onclick="nav('i','tls')" data-keywords="tls ats nsallowsarbitraryloads transport">
           <div class="nav-item-dot"></div>Transport Layer Security
         </div>
-        <div class="nav-item" onclick="showPage('ios','sensitive-data')" data-keywords="sensitive data sqlite plist realm cache">
+        <div class="nav-item" onclick="nav('i','sensitive-data')" data-keywords="sensitive data sqlite plist realm cache">
           <div class="nav-item-dot"></div>Sensitive Data Disclosure
         </div>
-        <div class="nav-item" onclick="showPage('ios','hardcoded-dyn')" data-keywords="hardcoded data device runtime nsuserdefaults">
+        <div class="nav-item" onclick="nav('i','hardcoded-dyn')" data-keywords="hardcoded data device runtime nsuserdefaults">
           <div class="nav-item-dot"></div>Hard-Coded Data
         </div>
-        <div class="nav-item" onclick="showPage('ios','keyboard-cache')" data-keywords="keyboard cache uitextfield securetextentry">
+        <div class="nav-item" onclick="nav('i','keyboard-cache')" data-keywords="keyboard cache uitextfield securetextentry">
           <div class="nav-item-dot"></div>Keyboard Caching
         </div>
-        <div class="nav-item" onclick="showPage('ios','asl')" data-keywords="apple system logs asl oslog console">
+        <div class="nav-item" onclick="nav('i','asl')" data-keywords="apple system logs asl oslog console">
           <div class="nav-item-dot"></div>Apple System Logs (ASL)
         </div>
-        <div class="nav-item" onclick="showPage('ios','ios-backup')" data-keywords="ios backup itunes idevicebackup2">
+        <div class="nav-item" onclick="nav('i','ios-backup')" data-keywords="ios backup itunes idevicebackup2">
           <div class="nav-item-dot"></div>iOS Backups
         </div>
-        <div class="nav-item" onclick="showPage('ios','local-server')" data-keywords="local server port netstat nmap">
+        <div class="nav-item" onclick="nav('i','local-server')" data-keywords="local server port netstat nmap">
           <div class="nav-item-dot"></div>iOS Local Server
         </div>
-        <div class="nav-item" onclick="showPage('ios','mem-dumps')" data-keywords="memory dump fridump objection">
+        <div class="nav-item" onclick="nav('i','mem-dumps')" data-keywords="memory dump fridump objection">
           <div class="nav-item-dot"></div>Memory Dumps
         </div>
-        <div class="nav-item" onclick="showPage('ios','fs-monitor')" data-keywords="filesystem monitor objection idevicefs">
+        <div class="nav-item" onclick="nav('i','fs-monitor')" data-keywords="filesystem monitor objection idevicefs">
           <div class="nav-item-dot"></div>Filesystem Monitoring
         </div>
-        <div class="nav-item" onclick="showPage('ios','url-schemes')" data-keywords="url schemes custom deep link fuzzing">
+        <div class="nav-item" onclick="nav('i','url-schemes')" data-keywords="url schemes custom deep link fuzzing">
           <div class="nav-item-dot"></div>Fuzzing URL Schemes
         </div>
-        <div class="nav-item" onclick="showPage('ios','keychain')" data-keywords="keychain dump objection kc attributes">
+        <div class="nav-item" onclick="nav('i','keychain')" data-keywords="keychain dump objection kc attributes">
           <div class="nav-item-dot"></div>Keychain Protection
         </div>
-        <div class="nav-item" onclick="showPage('ios','crypto-monitor')" data-keywords="crypto commoncrypto frida hook monitor">
+        <div class="nav-item" onclick="nav('i','crypto-monitor')" data-keywords="crypto commoncrypto frida hook monitor">
           <div class="nav-item-dot"></div>iOS Crypto Monitoring
         </div>
-        <div class="nav-item" onclick="showPage('ios','data-prot-dyn')" data-keywords="data protection class frida runtime">
+        <div class="nav-item" onclick="nav('i','data-prot-dyn')" data-keywords="data protection class frida runtime">
           <div class="nav-item-dot"></div>Data Protection
         </div>
-        <div class="nav-item" onclick="showPage('ios','session-cookies')" data-keywords="session cookies nshttpcookiestorage webkit">
+        <div class="nav-item" onclick="nav('i','session-cookies')" data-keywords="session cookies nshttpcookiestorage webkit">
           <div class="nav-item-dot"></div>Session Cookies
         </div>
-        <div class="nav-item" onclick="showPage('ios','app-snapshots')" data-keywords="app snapshots background screenshot">
+        <div class="nav-item" onclick="nav('i','app-snapshots')" data-keywords="app snapshots background screenshot">
           <div class="nav-item-dot"></div>App Snapshots
         </div>
-        <div class="nav-item" onclick="showPage('ios','http-cache')" data-keywords="http cache cache.db library caches">
+        <div class="nav-item" onclick="nav('i','http-cache')" data-keywords="http cache cache.db library caches">
           <div class="nav-item-dot"></div>HTTP Caching
         </div>
-        <div class="nav-item" onclick="showPage('ios','universal-links')" data-keywords="universal links apple-app-site-association entitlements">
+        <div class="nav-item" onclick="nav('i','universal-links')" data-keywords="universal links apple-app-site-association entitlements">
           <div class="nav-item-dot"></div>iOS Universal Links
         </div>
-        <div class="nav-item" onclick="showPage('ios','pasteboard')" data-keywords="pasteboard uipasteboard clipboard leakage">
+        <div class="nav-item" onclick="nav('i','pasteboard')" data-keywords="pasteboard uipasteboard clipboard leakage">
           <div class="nav-item-dot"></div>Pasteboard Leakage
         </div>
-        <div class="nav-item" onclick="showPage('ios','biometrics')" data-keywords="biometrics touchid faceid lacontext bypass">
+        <div class="nav-item" onclick="nav('i','biometrics')" data-keywords="biometrics touchid faceid lacontext bypass">
           <div class="nav-item-dot"></div>Biometrics Testing
         </div>
-        <div class="nav-item" onclick="showPage('ios','debugging')" data-keywords="debugging lldb cycript dtrace">
+        <div class="nav-item" onclick="nav('i','debugging')" data-keywords="debugging lldb cycript dtrace">
           <div class="nav-item-dot"></div>Debugging iOS Apps
         </div>
       </div>
@@ -623,17 +491,17 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
 
     <!-- BYPASSES -->
     <div class="nav-section" data-section="bypass">
-      <div class="nav-section-header" onclick="toggleSection(this,'ios')">
+      <div class="nav-section-header" onclick="tog(this,'i')">
         <div class="nav-section-icon icon-bypass">🛡️</div>
         <span class="nav-section-title">Bypasses</span>
         <span class="nav-section-count">2</span>
         <span class="nav-section-arrow">▶</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item" onclick="showPage('ios','cert-pinning')" data-keywords="ssl pinning bypass ssl kill switch frida">
+        <div class="nav-item" onclick="nav('i','cert-pinning')" data-keywords="ssl pinning bypass ssl kill switch frida">
           <div class="nav-item-dot"></div>Bypass Certificate Pinning
         </div>
-        <div class="nav-item" onclick="showPage('ios','jb-detect')" data-keywords="jailbreak detection bypass liberty lite a-bypass">
+        <div class="nav-item" onclick="nav('i','jb-detect')" data-keywords="jailbreak detection bypass liberty lite a-bypass">
           <div class="nav-item-dot"></div>Bypass Jailbreak Detection
         </div>
       </div>
@@ -641,112 +509,78 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
 
     <!-- HTTP TRAFFIC -->
     <div class="nav-section" data-section="http">
-      <div class="nav-section-header" onclick="toggleSection(this,'ios')">
+      <div class="nav-section-header" onclick="tog(this,'i')">
         <div class="nav-section-icon icon-http">🌐</div>
         <span class="nav-section-title">HTTP Traffic</span>
         <span class="nav-section-count">3</span>
         <span class="nav-section-arrow">▶</span>
       </div>
       <div class="nav-items">
-        <div class="nav-item" onclick="showPage('ios','proxy')" data-keywords="proxy burp intercept configure">
+        <div class="nav-item" onclick="nav('i','proxy')" data-keywords="proxy burp intercept configure">
           <div class="nav-item-dot"></div>Configure Intercept Proxy
         </div>
-        <div class="nav-item" onclick="showPage('ios','web-backend')" data-keywords="web backend api testing">
+        <div class="nav-item" onclick="nav('i','web-backend')" data-keywords="web backend api testing">
           <div class="nav-item-dot"></div>Web App Backend Testing
         </div>
-        <div class="nav-item" onclick="showPage('ios','flexible')" data-keywords="flexible record http communications">
+        <div class="nav-item" onclick="nav('i','flexible')" data-keywords="flexible record http communications">
           <div class="nav-item-dot"></div>FLEXible HTTP Recording
         </div>
       </div>
     </div>
 
-  </nav>
-  </div>
-
+  </nav>  </div>
 </aside>
 
-<!-- ═══ MAIN ══════════════════════════════════ -->
 <main id="main">
-  <div class="top-bar">
-    <div class="breadcrumb">
-      <span class="bc-plat" id="bc-plat">Android</span>
+  <div class="topbar">
+    <div class="bc">
+      <span id="bc-plat">Android</span>
       <span>/</span>
-      <span class="bc-current" id="bc-current">App Discovery</span>
+      <span id="bc-cur">Methodology</span>
     </div>
-    <div class="progress-pill">
-      <span class="progress-label">PROGRESS</span>
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-    </div>
-  </div>
-
-  <!-- WELCOME -->
-  <div id="welcome">
-    <div class="welcome-logo">📱</div>
-    <h1>Mobile <span class="hl">PenTest</span> Notebook</h1>
-    <p>Complete reference for Android &amp; iOS application security testing. Select a platform to begin.</p>
-    <div class="welcome-platforms">
-      <div class="wp-card" onclick="switchPlatform('android'); showPage('and','methodology');">
-        <div class="wp-icon">🤖</div>
-        <div class="wp-label">Android</div>
-      </div>
-      <div class="wp-card" onclick="switchPlatform('ios'); showPage('ios','methodology');">
-        <div class="wp-icon">🍎</div>
-        <div class="wp-label">iOS</div>
-      </div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-item"><div class="stat-num">2</div><div class="stat-label">Platforms</div></div>
-      <div class="stat-item"><div class="stat-num">68</div><div class="stat-label">Topics</div></div>
-      <div class="stat-item"><div class="stat-num">250+</div><div class="stat-label">Commands</div></div>
-      <div class="stat-item"><div class="stat-num">10</div><div class="stat-label">Phases</div></div>
+    <div class="pp">
+      <span class="pp-lbl">PROGRESS</span>
+      <div class="pp-bar"><div id="prog"></div></div>
     </div>
   </div>
 
-  <!-- ANDROID CONTENT -->
-  <div class="platform-view" id="and-view">
-    
-<!-- ══ ANDROID METHODOLOGY ══ -->
-<div class="content-section" id="and-page-methodology">
+  <div id="pv-a" class="pv">
+<div class="content-section" id="a-page-methodology">
   <div class="section-hero">
-    <div class="section-hero-eyebrow">Android Testing · Methodology</div>
+    <div class="section-hero-eyebrow">Android Testing &middot; Methodology</div>
     <h1>Android Pentest Methodology</h1>
-    <div class="section-hero-desc">A structured, phase-based approach to testing Android applications — from initial reconnaissance through backend API validation. Based on OWASP MASVS / MASTG standards.</div>
+    <div class="section-hero-desc">A structured, phase-based approach to testing Android applications &mdash; from initial reconnaissance through backend API validation. Based on OWASP MASVS / MASTG standards.</div>
   </div>
   <div class="tags"><span class="tag tag-green">OWASP MASVS</span><span class="tag tag-blue">MASTG</span><span class="tag tag-orange">STRUCTURED</span></div>
-
-  <h2>Testing Phases Overview</h2>
+  <h2>Phases Overview</h2>
   <div class="grid-2">
-    <div class="mini-card"><div class="mini-card-title">Phase 1 — Reconnaissance</div><p>Gather APK, enumerate attack surface, identify app type, review AndroidManifest.xml, map components.</p></div>
-    <div class="mini-card"><div class="mini-card-title">Phase 2 — Static Analysis</div><p>Decompile APK, find hardcoded secrets, insecure configs, certificate pinning implementation, exported components.</p></div>
-    <div class="mini-card"><div class="mini-card-title">Phase 3 — Dynamic Analysis</div><p>Run the app with Frida/Objection attached. Monitor file writes, logs, memory, crypto operations, component interactions.</p></div>
-    <div class="mini-card"><div class="mini-card-title">Phase 4 — Network Testing</div><p>Intercept HTTP/HTTPS traffic via Burp. Test API endpoints for auth issues, IDOR, injection, business logic flaws.</p></div>
+    <div class="mini-card"><div class="mini-card-title">Phase 1 &mdash; Reconnaissance</div><p>Obtain APK, review AndroidManifest.xml, enumerate components, permissions, and app type.</p></div>
+    <div class="mini-card"><div class="mini-card-title">Phase 2 &mdash; Static Analysis</div><p>Decompile APK, find hardcoded secrets, insecure configs, certificate pinning implementation, exported components.</p></div>
+    <div class="mini-card"><div class="mini-card-title">Phase 3 &mdash; Dynamic Analysis</div><p>Run app with Frida/Objection attached. Monitor file writes, logs, memory, crypto operations.</p></div>
+    <div class="mini-card"><div class="mini-card-title">Phase 4 &mdash; Network Testing</div><p>Intercept HTTP/HTTPS via Burp. Test API endpoints for auth issues, IDOR, injection, business logic flaws.</p></div>
   </div>
-
-  <h2>Phase 1 — Reconnaissance Checklist</h2>
+  <h2>Phase 1 &mdash; Reconnaissance Checklist</h2>
   <ul>
     <li>Obtain APK from device (<code>adb pull</code>), APKPure, or APKCombo</li>
     <li>Identify target package name: <code>adb shell pm list packages | grep target</code></li>
-    <li>Review <code>AndroidManifest.xml</code> — exported components, permissions, intent filters</li>
+    <li>Review <code>AndroidManifest.xml</code> &mdash; exported components, permissions, intent filters</li>
     <li>Identify app type: Native Java/Kotlin, React Native, Flutter, Cordova</li>
-    <li>Check minimum SDK and target SDK versions for version-specific vulnerabilities</li>
-    <li>Map all declared permissions — flag <code>DANGEROUS</code> and <code>custom</code> permissions</li>
+    <li>Check min SDK and target SDK versions for version-specific vulnerabilities</li>
+    <li>Map all declared permissions &mdash; flag <code>DANGEROUS</code> and custom permissions</li>
     <li>Record all exported Activities, Services, Receivers, and ContentProviders</li>
   </ul>
-
-  <h2>Phase 2 — Static Analysis Checklist</h2>
+  <h2>Phase 2 &mdash; Static Analysis Checklist</h2>
   <ul>
-    <li>Decompile with <code>apktool d target.apk</code> (Smali) and <code>jadx-gui target.apk</code> (Java)</li>
+    <li>Decompile with <code>apktool d target.apk</code> and <code>jadx-gui target.apk</code></li>
     <li>Search for hardcoded secrets: API keys, tokens, passwords, private keys</li>
-    <li>Check Network Security Config (<code>network_security_config.xml</code>) for <code>trust-anchors</code> misconfig</li>
-    <li>Find all HTTP URLs — flag any <code>http://</code> (cleartext traffic)</li>
+    <li>Check <code>network_security_config.xml</code> for trust-anchors misconfiguration</li>
+    <li>Find all HTTP URLs &mdash; flag any cleartext <code>http://</code> traffic</li>
     <li>Check for <code>allowBackup="true"</code> on sensitive apps</li>
     <li>Scan with MobSF for automated initial findings</li>
     <li>Review custom SSL pinning implementation in code</li>
-    <li>Check ProGuard / R8 obfuscation level</li>
-    <li>Look for debug flags: <code>android:debuggable="true"</code></li>
+    <li>Check ProGuard/R8 obfuscation level and debug flags</li>
   </ul>
-
-  <h2>Phase 3 — Dynamic Analysis Checklist</h2>
+  <h2>Phase 3 &mdash; Dynamic Analysis Checklist</h2>
   <ul>
     <li>Set up Frida server on rooted device, attach with Objection</li>
     <li>Run <code>env</code> in Objection to map all app directories</li>
@@ -755,32 +589,26 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
     <li>Monitor <code>logcat</code> for sensitive data leakage during all user actions</li>
     <li>Test all exported components with adb/Drozer (intent injection)</li>
     <li>Attempt app backup: <code>adb backup -apk com.target.app</code></li>
-    <li>Dump memory with fridump3 after login — search for tokens/keys</li>
-    <li>Monitor filesystem: list files before and after sensitive operations</li>
-    <li>Test biometric implementation — crypto-bound or boolean?</li>
-    <li>Check for clipboard leakage, screenshot exposure</li>
-    <li>Run root/emulator detection → bypass with Objection/Magisk/Frida</li>
+    <li>Dump memory with fridump3 after login &mdash; search for tokens/keys</li>
+    <li>Test biometric implementation &mdash; crypto-bound or boolean?</li>
+    <li>Run root/emulator detection &rarr; bypass with Objection/Magisk/Frida</li>
   </ul>
-
-  <h2>Phase 4 — Network Testing Checklist</h2>
+  <h2>Phase 4 &mdash; Network Testing Checklist</h2>
   <ul>
-    <li>Configure Burp Suite, install CA cert (<code>adb push → /system/etc/security/cacerts</code>)</li>
-    <li>Bypass SSL pinning (Objection <code>android sslpinning disable</code> or Frida script)</li>
+    <li>Configure Burp Suite, install CA cert to system store</li>
+    <li>Bypass SSL pinning: <code>android sslpinning disable</code> in Objection</li>
     <li>Map all API endpoints from proxied traffic</li>
-    <li>Test for IDOR — increment/swap object IDs across accounts</li>
-    <li>Decode and analyze JWT tokens — test alg:none, weak secrets</li>
-    <li>Check authorization on every endpoint — test with a lower-privilege token</li>
+    <li>Test for IDOR &mdash; increment/swap object IDs across accounts</li>
+    <li>Decode and analyze JWT tokens &mdash; test alg:none, weak secrets</li>
+    <li>Check authorization on every endpoint with a lower-privilege token</li>
     <li>Test rate limiting on OTP, login, and password reset endpoints</li>
-    <li>Identify mobile-specific headers (X-Device-ID, etc.) — attempt spoofing</li>
-    <li>Test for mass assignment — add unexpected fields to POST bodies</li>
+    <li>Test for mass assignment &mdash; add unexpected fields to POST bodies</li>
   </ul>
-
-  <h2>Tool Stack</h2>
-  <div class="table-wrap">
-  <table>
+  <h2>Android Tool Stack</h2>
+  <div class="table-wrap"><table>
     <thead><tr><th>Category</th><th>Tool</th><th>Purpose</th></tr></thead>
     <tbody>
-      <tr><td>Decompile</td><td>jadx-gui, apktool, dex2jar</td><td>APK → readable Java/Smali source</td></tr>
+      <tr><td>Decompile</td><td>jadx-gui, apktool, dex2jar</td><td>APK &rarr; readable Java/Smali source</td></tr>
       <tr><td>Dynamic</td><td>Frida, Objection</td><td>Runtime hooking, bypass, data extraction</td></tr>
       <tr><td>Components</td><td>Drozer, adb</td><td>Intent injection, exported component testing</td></tr>
       <tr><td>Network</td><td>Burp Suite, mitmproxy</td><td>HTTP/HTTPS interception and testing</td></tr>
@@ -788,25 +616,13 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:26px 0; }
       <tr><td>Root Mgmt</td><td>Magisk, Shamiko</td><td>Root management and detection bypass</td></tr>
       <tr><td>Memory</td><td>fridump3</td><td>Process memory dump and search</td></tr>
     </tbody>
-  </table>
-  </div>
-
-  <div class="callout info"><div class="callout-icon">📋</div><div><span class="callout-title">OWASP MASTG Reference</span>This methodology aligns with the <strong>OWASP Mobile Application Security Testing Guide (MASTG)</strong>. For each finding, map it to the corresponding <strong>MASVS</strong> control (e.g., MASVS-STORAGE-1, MASVS-NETWORK-1) for structured reporting.</div></div>
+  </table></div>
+  <div class="callout info"><div class="callout-icon">&#128203;</div><div><span class="callout-title">OWASP MASTG Reference</span>Map every finding to a MASVS control: MASVS-STORAGE, MASVS-NETWORK, MASVS-PLATFORM, MASVS-CODE, MASVS-RESILIENCE.</div></div>
 </div>
-
-    <h1>Android <span>PenTest</span> Notebook</h1>
-    <p>A structured, teacher-style guide covering every layer of Android application security testing — from reconnaissance to HTTP traffic analysis.</p>
-    <div class="stats-row">
-      <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Phases</div></div>
-      <div class="stat-item"><div class="stat-num">28</div><div class="stat-label">Topics</div></div>
-      <div class="stat-item"><div class="stat-num">100+</div><div class="stat-label">Commands</div></div>
-    </div>
-  </div>
-
 <!-- ════════════════════════════════════════
      1. ANDROID API VERSIONS
 ═════════════════════════════════════════ -->
-<div class="content-section active" id="and-page-android-api">
+<div class="content-section" id="a-page-android-api">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 01</div>
     <h1>Android API Versions</h1>
@@ -906,7 +722,7 @@ adb shell dumpsys package com.target.app | grep -E "targetSdk|minSdk"</code>
 <!-- ════════════════════════════════════════
      2. APP ARCHITECTURE
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-app-arch">
+<div class="content-section" id="a-page-app-arch">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 02</div>
     <h1>App Architecture</h1>
@@ -1002,7 +818,7 @@ adb shell dumpsys package com.target.app | grep -E "targetSdk|minSdk"</code>
 <!-- ════════════════════════════════════════
      3. ADB
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-adb">
+<div class="content-section" id="a-page-adb">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 03</div>
     <h1>Android Debug Bridge (ADB)</h1>
@@ -1164,7 +980,7 @@ adb forward --list</code>
 <!-- ════════════════════════════════════════
      4. APP PERMISSIONS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-permissions">
+<div class="content-section" id="a-page-permissions">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 04</div>
     <h1>App Permissions</h1>
@@ -1256,7 +1072,7 @@ grep -i "uses-permission" AndroidManifest.xml</code>
 <!-- ════════════════════════════════════════
      5. ANDROID APP TYPES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-app-types">
+<div class="content-section" id="a-page-app-types">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 05</div>
     <h1>Android App Types</h1>
@@ -1321,7 +1137,7 @@ webView.<span class="fn">loadUrl</span>(url); <span class="cm">// No validation!
 <!-- ════════════════════════════════════════
      6. APP COMPONENTS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-app-components">
+<div class="content-section" id="a-page-app-components">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 06</div>
     <h1>App Components</h1>
@@ -1405,7 +1221,7 @@ dz> run app.provider.query content://com.target.app.provider/users</code>
 <!-- ════════════════════════════════════════
      7. DEVICE APP DIRECTORIES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-directories">
+<div class="content-section" id="a-page-directories">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 07</div>
     <h1>Device App Directories</h1>
@@ -1461,7 +1277,7 @@ adb shell grep -rn "password\|token\|secret\|key\|auth" \
 <!-- ════════════════════════════════════════
      8. DECODE & DECOMPILE APK
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-decompile">
+<div class="content-section" id="a-page-decompile">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 01</div>
     <h1>Decode &amp; Decompile APK File</h1>
@@ -1578,7 +1394,7 @@ adb install patched-aligned.apk</code>
 <!-- ════════════════════════════════════════
      9. BINARY PROTECTIONS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-binary-prot">
+<div class="content-section" id="a-page-binary-prot">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 02</div>
     <h1>Binary Protections</h1>
@@ -1655,7 +1471,7 @@ Java.perform(<span class="kw">function</span>() {
 <!-- ════════════════════════════════════════
      10. HARDCODED DATA / APK
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-hardcoded-apk">
+<div class="content-section" id="a-page-hardcoded-apk">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 03</div>
     <h1>HardCoded Data — APK File</h1>
@@ -1747,7 +1563,7 @@ strings decoded/lib/arm64-v8a/libnative.so | grep -iE \
 <!-- ════════════════════════════════════════
      11. HARDCODED DATA / ON DEVICE
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-hardcoded-dev">
+<div class="content-section" id="a-page-hardcoded-dev">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 04</div>
     <h1>HardCoded Data — On Device</h1>
@@ -1794,7 +1610,7 @@ adb shell grep -rn "token\|password\|auth\|secret" \
 <!-- ════════════════════════════════════════
      12. THIRD PARTY LIBRARIES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-thirdparty">
+<div class="content-section" id="a-page-thirdparty">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 05</div>
     <h1>Third Party Libraries &amp; Frameworks</h1>
@@ -1858,7 +1674,7 @@ curl "https://&lt;project-id&gt;.firebaseio.com/.json?shallow=true"</code>
 <!-- ════════════════════════════════════════
      13. ENDPOINT DISCOVERY
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-endpoints">
+<div class="content-section" id="a-page-endpoints">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 06</div>
     <h1>Endpoint Discovery &amp; URLs</h1>
@@ -1916,7 +1732,7 @@ cat decoded/assets/index.android.bundle | \
 <!-- ════════════════════════════════════════
      14. MOBSF
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-mobsf">
+<div class="content-section" id="a-page-mobsf">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 07</div>
     <h1>Mobile Security Framework (MobSF)</h1>
@@ -1979,7 +1795,7 @@ curl "http://localhost:8000/api/v1/download_pdf?hash=&lt;hash&gt;" \
 <!-- ════════════════════════════════════════
      15. DROZER
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-drozer">
+<div class="content-section" id="a-page-drozer">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 01</div>
     <h1>Drozer</h1>
@@ -2084,7 +1900,7 @@ dz> run app.broadcast.send \
 <!-- ════════════════════════════════════════
      16. KEYBOARD CACHE
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-keyboard-cache">
+<div class="content-section" id="a-page-keyboard-cache">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 02</div>
     <h1>Android Keyboard Cache</h1>
@@ -2134,7 +1950,7 @@ adb shell pm list packages | grep -i keyboard</code>
 <!-- ════════════════════════════════════════
      17. SYSTEM LOGS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-syslogs">
+<div class="content-section" id="a-page-syslogs">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 03</div>
     <h1>System Logs (Logcat)</h1>
@@ -2198,7 +2014,7 @@ grep -rn "Log\." jadx_output/ | grep -iE \
 <!-- ════════════════════════════════════════
      18. ANDROID APP BACKUP
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-backup">
+<div class="content-section" id="a-page-backup">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 04</div>
     <h1>Android App Backup</h1>
@@ -2263,7 +2079,7 @@ sqlite3 apps/com.target.app/db/main.db .dump</code>
 <!-- ════════════════════════════════════════
      19. MEMORY DUMPS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-memdumps">
+<div class="content-section" id="a-page-memdumps">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 05</div>
     <h1>Memory Dumps</h1>
@@ -2319,7 +2135,7 @@ strings dump/*.data | grep -E "eyJ[A-Za-z0-9+/]+"</code>
 <!-- ════════════════════════════════════════
      20. FILESYSTEM MONITORING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-fs-monitor">
+<div class="content-section" id="a-page-fs-monitor">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 06</div>
     <h1>Filesystem Monitoring</h1>
@@ -2369,7 +2185,7 @@ android hooking watch class_method \
 <!-- ════════════════════════════════════════
      21. MONITOR CRYPTO FUNCTIONS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-crypto-monitor">
+<div class="content-section" id="a-page-crypto-monitor">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 07</div>
     <h1>Monitor Cryptographic Functions</h1>
@@ -2429,7 +2245,7 @@ android hooking watch class javax.crypto.SecretKeyFactory --dump-args</code>
 <!-- ════════════════════════════════════════
      22. ANDROID KEYSTORE MONITORING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-keystore">
+<div class="content-section" id="a-page-keystore">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 08</div>
     <h1>Android Keystore Monitoring</h1>
@@ -2486,7 +2302,7 @@ grep -rn "setUserAuthenticationRequired(false)\|setInvalidatedByBiometricEnrollm
 <!-- ════════════════════════════════════════
      23. SESSION COOKIES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-cookies">
+<div class="content-section" id="a-page-cookies">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 09</div>
     <h1>Review App Session Cookies</h1>
@@ -2543,7 +2359,7 @@ adb shell cat /data/data/com.target.app/shared_prefs/*.xml | grep -i cookie</cod
 <!-- ════════════════════════════════════════
      24. LOCAL SERVER
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-local-server">
+<div class="content-section" id="a-page-local-server">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 10</div>
     <h1>Local Server</h1>
@@ -2581,7 +2397,7 @@ curl http://127.0.0.1:8888/</code>
 <!-- ════════════════════════════════════════
      25. SHARED PREFERENCES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-shared-prefs">
+<div class="content-section" id="a-page-shared-prefs">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 11</div>
     <h1>Shared Preferences</h1>
@@ -2641,7 +2457,7 @@ getSharedPreferences(<span class="str">"prefs"</span>, MODE_PRIVATE);</code>
 <!-- ════════════════════════════════════════
      26. ENCRYPTED SHARED PREFERENCES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-enc-prefs">
+<div class="content-section" id="a-page-enc-prefs">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 12</div>
     <h1>Encrypted Shared Preferences</h1>
@@ -2690,7 +2506,7 @@ Java.perform(<span class="kw">function</span>() {
 <!-- ════════════════════════════════════════
      27. BIOMETRIC TESTING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-biometric">
+<div class="content-section" id="a-page-biometric">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 13</div>
     <h1>Biometric Testing</h1>
@@ -2754,7 +2570,7 @@ android biometrics bypass</code>
 <!-- ════════════════════════════════════════
      28. SSL PINNING BYPASS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-ssl-pinning">
+<div class="content-section" id="a-page-ssl-pinning">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Bypasses · Topic 01</div>
     <h1>SSL Pinning Bypass</h1>
@@ -2856,7 +2672,7 @@ grep -rn "CertificatePinner" decoded/smali/
 <!-- ════════════════════════════════════════
      29. ROOT DETECTION BYPASS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-root-detect">
+<div class="content-section" id="a-page-root-detect">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Bypasses · Topic 02</div>
     <h1>Bypass Root Detection</h1>
@@ -2967,7 +2783,7 @@ Java.perform(function() {
 <!-- ════════════════════════════════════════
      30. CONFIGURE INTERCEPT PROXY
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-proxy">
+<div class="content-section" id="a-page-proxy">
   <div class="section-hero">
     <div class="section-hero-eyebrow">HTTP Traffic · Topic 01</div>
     <h1>Configure an Intercept Proxy</h1>
@@ -3047,7 +2863,7 @@ adb shell settings put global http_proxy :0</code>
 <!-- ════════════════════════════════════════
      31. WEB APP BACKEND TESTING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="and-page-web-backend">
+<div class="content-section" id="a-page-web-backend">
   <div class="section-hero">
     <div class="section-hero-eyebrow">HTTP Traffic · Topic 02</div>
     <h1>Web Application Backend Testing</h1>
@@ -3132,124 +2948,93 @@ grep -rn "ALLOW_ALL_HOSTNAME_VERIFIER\|getAcceptedIssuers.*return null\|checkCli
 
   <div class="callout tip"><div class="callout-icon">💡</div><div><span class="callout-title">Mobile vs Web</span>Mobile apps often have versioned APIs (<code>/api/v1/</code>, <code>/api/v2/</code>). Always test old API versions — they often lack the security controls added to newer versions. Try <code>/api/v1/admin</code> even if the app uses <code>/api/v3/</code>.</div></div>
 </div>
-
-
   </div>
 
-  <!-- iOS CONTENT -->
-  <div class="platform-view" id="ios-view">
-    
-<!-- ══ iOS METHODOLOGY ══ -->
-<div class="content-section" id="ios-page-methodology">
+  <div id="pv-i" class="pv">
+<div class="content-section" id="i-page-methodology">
   <div class="section-hero">
-    <div class="section-hero-eyebrow">iOS Testing · Methodology</div>
+    <div class="section-hero-eyebrow">iOS Testing &middot; Methodology</div>
     <h1>iOS Pentest Methodology</h1>
-    <div class="section-hero-desc">A structured, phase-based approach to testing iOS applications — from IPA acquisition and decryption through runtime analysis and network interception. Aligned with OWASP MASVS / MASTG standards.</div>
+    <div class="section-hero-desc">A structured, phase-based approach to testing iOS applications &mdash; from IPA acquisition and decryption through runtime analysis and network interception. Aligned with OWASP MASVS / MASTG standards.</div>
   </div>
   <div class="tags"><span class="tag tag-blue">OWASP MASVS</span><span class="tag tag-green">MASTG</span><span class="tag tag-purple">iOS SPECIFIC</span></div>
-
-  <h2>Testing Phases Overview</h2>
+  <h2>Phases Overview</h2>
   <div class="grid-2">
-    <div class="mini-card"><div class="mini-card-title">Phase 1 — Acquisition</div><p>Obtain IPA, decrypt FairPlay DRM (jailbroken device), identify app type, inspect Info.plist and provisioning profile.</p></div>
-    <div class="mini-card"><div class="mini-card-title">Phase 2 — Static Analysis</div><p>Extract binary, check protections, dump ObjC headers with class-dump, search for hardcoded secrets, map ATS config and endpoints.</p></div>
-    <div class="mini-card"><div class="mini-card-title">Phase 3 — Dynamic Analysis</div><p>Attach Frida/Objection on jailbroken device. Monitor file system, memory, crypto ops, keychain access, and URL scheme handling.</p></div>
-    <div class="mini-card"><div class="mini-card-title">Phase 4 — Network Testing</div><p>Configure Burp + install CA cert, bypass SSL pinning, intercept API traffic, test backend for IDOR, JWT issues, and rate limiting.</p></div>
+    <div class="mini-card"><div class="mini-card-title">Phase 1 &mdash; Acquisition</div><p>Obtain IPA, decrypt FairPlay DRM, identify app type, inspect Info.plist and provisioning profile.</p></div>
+    <div class="mini-card"><div class="mini-card-title">Phase 2 &mdash; Static Analysis</div><p>Extract binary, check protections, dump ObjC headers, search for hardcoded secrets, map ATS config.</p></div>
+    <div class="mini-card"><div class="mini-card-title">Phase 3 &mdash; Dynamic Analysis</div><p>Attach Frida/Objection. Monitor filesystem, memory, crypto ops, keychain access, URL scheme handling.</p></div>
+    <div class="mini-card"><div class="mini-card-title">Phase 4 &mdash; Network Testing</div><p>Configure Burp + CA cert, bypass SSL pinning, intercept API traffic, test backend vulnerabilities.</p></div>
   </div>
-
   <h2>iOS-Specific Prerequisites</h2>
   <ul>
-    <li><strong>Jailbroken device</strong> is strongly recommended — many tests require filesystem access, Frida attachment, and Keychain dumping that only work jailbroken</li>
-    <li>Install <strong>Frida</strong> from Cydia/Sileo (build.frida.re repo) on the device</li>
-    <li>Install <strong>Objection</strong> on Mac: <code>pip3 install objection</code></li>
-    <li>Set up <strong>iproxy</strong> for USB tunnel: <code>iproxy 2222 22</code></li>
+    <li><strong>Jailbroken device</strong> is strongly recommended for most tests</li>
+    <li>Install Frida from Cydia/Sileo (build.frida.re repo) on the device</li>
+    <li>Install Objection on Mac: <code>pip3 install objection</code></li>
+    <li>Set up iproxy for USB tunnel: <code>iproxy 2222 22</code></li>
     <li>Change default SSH password immediately: <code>passwd</code> on device</li>
-    <li>Have <strong>class-dump</strong>, <strong>otool</strong>, <strong>ldid</strong>, <strong>plutil</strong> installed on Mac</li>
+    <li>Have class-dump, otool, ldid, plutil installed on Mac</li>
   </ul>
-
-  <h2>Phase 1 — Acquisition Checklist</h2>
+  <h2>Phase 1 &mdash; Acquisition Checklist</h2>
   <ul>
-    <li>Obtain IPA — from App Store (encrypted), TestFlight, enterprise distribution (often unencrypted!), or directly via SSH from a jailbroken device</li>
-    <li>Check encryption: <code>otool -l binary | grep cryptid</code> — if <code>cryptid 1</code>, decrypt first</li>
-    <li>Decrypt App Store IPA using <strong>frida-ios-dump</strong> or <strong>bfdecrypt</strong></li>
+    <li>Obtain IPA from App Store (encrypted), TestFlight, or enterprise distribution (often unencrypted)</li>
+    <li>Check encryption: <code>otool -l binary | grep cryptid</code> &mdash; if 1, decrypt first</li>
+    <li>Decrypt App Store IPA using frida-ios-dump or bfdecrypt</li>
     <li>Identify app type (Swift/ObjC/React Native/Flutter) by inspecting bundle contents</li>
-    <li>Read <code>Info.plist</code> — permissions, URL schemes, ATS config, background modes</li>
+    <li>Read Info.plist &mdash; permissions, URL schemes, ATS config, background modes</li>
     <li>Decode provisioning profile: <code>security cms -D -i embedded.mobileprovision</code></li>
   </ul>
-
-  <h2>Phase 2 — Static Analysis Checklist</h2>
+  <h2>Phase 2 &mdash; Static Analysis Checklist</h2>
   <ul>
-    <li>Check binary protections: PIE, Stack Canary, ARC via <code>otool</code> or <code>checksec.py</code></li>
-    <li>Dump ObjC headers: <code>class-dump -H -o headers/ TargetApp</code> — search for auth, crypto, admin methods</li>
-    <li>Extract all URLs/endpoints: <code>strings binary | grep https://</code></li>
+    <li>Check binary protections: PIE, Stack Canary, ARC via otool or checksec.py</li>
+    <li>Dump ObjC headers: <code>class-dump -H -o headers/ TargetApp</code></li>
+    <li>Extract all URLs: <code>strings binary | grep https://</code></li>
     <li>Grep for hardcoded secrets: API keys, tokens, private keys, Firebase config</li>
-    <li>Check Data Protection class usage: grep for <code>NSFileProtectionNone</code> and <code>kSecAttrAccessibleAlways</code></li>
-    <li>Map ATS configuration — flag <code>NSAllowsArbitraryLoads: true</code></li>
-    <li>Check third-party SDKs — identify risky libraries (old AFNetworking, Firebase, Realm)</li>
-    <li>For React Native: beautify <code>main.jsbundle</code> — full source code in plaintext</li>
+    <li>Check Data Protection class usage &mdash; flag NSFileProtectionNone</li>
+    <li>Map ATS configuration &mdash; flag NSAllowsArbitraryLoads: true</li>
+    <li>For React Native: beautify main.jsbundle &mdash; full source code in plaintext</li>
   </ul>
-
-  <h2>Phase 3 — Dynamic Analysis Checklist</h2>
+  <h2>Phase 3 &mdash; Dynamic Analysis Checklist</h2>
   <ul>
-    <li>Start frida-server on device, attach: <code>objection -g com.target.app explore</code></li>
-    <li>Run <code>env</code> — map Bundle Path, Data Path, Caches path</li>
+    <li>Attach: <code>objection -g com.target.app explore</code>, run <code>env</code></li>
     <li>Dump NSUserDefaults: <code>ios nsuserdefaults get</code></li>
-    <li>Dump Keychain: <code>ios keychain dump</code> — check accessibility attributes</li>
-    <li>Check NSFileManager writes with Frida hook — look for <code>NSFileProtectionNone</code></li>
+    <li>Dump Keychain: <code>ios keychain dump</code> &mdash; check accessibility attributes</li>
     <li>Read all SQLite DBs, Realm files, Core Data under Data container</li>
-    <li>Stream system logs: <code>idevicesyslog | grep com.target.app</code> (no jailbreak needed)</li>
-    <li>Check keyboard cache: type into all fields, inspect <code>dynamic-text.dat</code></li>
-    <li>Trigger background → check Snapshots directory for sensitive screenshot</li>
-    <li>Create iTunes backup → analyze with Manifest.db to find backed-up sensitive files</li>
+    <li>Stream system logs: <code>idevicesyslog | grep com.target.app</code></li>
+    <li>Check keyboard cache: type into all fields, inspect dynamic-text.dat</li>
+    <li>Trigger background &rarr; check Snapshots directory for sensitive screenshot</li>
     <li>Hook CCCrypt to capture encryption key, IV, and plaintext</li>
-    <li>Fuzz URL schemes with all parameter combinations</li>
-    <li>Test biometric: try <code>ios ui biometrics_bypass</code> in Objection</li>
-    <li>Check HTTP cache: <code>Cache.db</code> in Library/Caches — contains full API responses</li>
-    <li>Use FLEX (FLEXible tweak) for network history — bypasses proxy detection</li>
+    <li>Test biometric: <code>ios ui biometrics_bypass</code> in Objection</li>
+    <li>Use FLEX (FLEXible tweak) for network history &mdash; bypasses proxy detection</li>
   </ul>
-
-  <h2>Phase 4 — Network Testing Checklist</h2>
+  <h2>Phase 4 &mdash; Network Testing Checklist</h2>
   <ul>
-    <li>Configure Burp — set WiFi proxy on device, install and trust Burp CA cert</li>
-    <li>Bypass SSL pinning: Objection <code>ios sslpinning disable</code> → SSL Kill Switch 2 → frida-ios-unpinning.js</li>
-    <li>Map all API endpoints from traffic, cross-reference with static strings analysis</li>
+    <li>Configure Burp &mdash; set WiFi proxy on device, install and trust Burp CA cert</li>
+    <li>Bypass SSL pinning: Objection ios sslpinning disable &rarr; SSL Kill Switch 2 &rarr; frida-ios-unpinning.js</li>
+    <li>Map all API endpoints from traffic, cross-reference with static analysis</li>
     <li>Test IDOR, JWT weaknesses, rate limiting, mass assignment</li>
-    <li>Test mobile-specific headers (X-Platform, X-App-Version, X-Device-ID) for spoofing</li>
-    <li>For non-proxy-aware apps: use FLEX network history or transparent proxy with iptables</li>
+    <li>Test mobile-specific headers (X-Platform, X-App-Version) for spoofing</li>
+    <li>For non-proxy-aware apps: use FLEX network history or transparent proxy</li>
   </ul>
-
   <h2>iOS Tool Stack</h2>
-  <div class="table-wrap">
-  <table>
+  <div class="table-wrap"><table>
     <thead><tr><th>Category</th><th>Tool</th><th>Purpose</th></tr></thead>
     <tbody>
       <tr><td>Decryption</td><td>frida-ios-dump, bfdecrypt</td><td>Remove FairPlay DRM from App Store IPAs</td></tr>
-      <tr><td>Static</td><td>class-dump, otool, Hopper, Ghidra</td><td>Header extraction, binary analysis, decompilation</td></tr>
-      <tr><td>Dynamic</td><td>Frida, Objection</td><td>Runtime hooking, keychain dump, bypass, monitoring</td></tr>
+      <tr><td>Static</td><td>class-dump, otool, Hopper, Ghidra</td><td>Header extraction, binary analysis</td></tr>
+      <tr><td>Dynamic</td><td>Frida, Objection</td><td>Runtime hooking, keychain dump, bypass</td></tr>
       <tr><td>Network</td><td>Burp Suite, Proxyman, FLEX</td><td>HTTP/HTTPS interception</td></tr>
       <tr><td>Pinning Bypass</td><td>SSL Kill Switch 2, frida-ios-unpinning</td><td>Certificate pinning bypass</td></tr>
       <tr><td>JB Detection</td><td>A-Bypass, Shadow, Objection</td><td>Jailbreak detection bypass</td></tr>
       <tr><td>Memory</td><td>fridump3</td><td>Process memory dump</td></tr>
       <tr><td>Backup</td><td>idevicebackup2, iMazing</td><td>iTunes backup creation and parsing</td></tr>
     </tbody>
-  </table>
-  </div>
-
-  <div class="callout info"><div class="callout-icon">📋</div><div><span class="callout-title">OWASP MASTG Reference</span>Map every finding to a <strong>MASVS</strong> control for structured reporting. Key controls: MASVS-STORAGE (data at rest), MASVS-NETWORK (TLS/pinning), MASVS-PLATFORM (IPC/URL schemes), MASVS-CODE (binary protections), MASVS-RESILIENCE (jailbreak/debug detection).</div></div>
+  </table></div>
+  <div class="callout info"><div class="callout-icon">&#128203;</div><div><span class="callout-title">OWASP MASTG Reference</span>Map findings to MASVS controls: MASVS-STORAGE, MASVS-NETWORK, MASVS-PLATFORM, MASVS-CODE, MASVS-RESILIENCE.</div></div>
 </div>
-
-    <h1>iOS <span>PenTest</span> Notebook</h1>
-    <p>A complete teacher-style guide to iOS application security testing — from app extraction to HTTP traffic interception.</p>
-    <div class="stats-row">
-      <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Phases</div></div>
-      <div class="stat-item"><div class="stat-num">37</div><div class="stat-label">Topics</div></div>
-      <div class="stat-item"><div class="stat-num">120+</div><div class="stat-label">Commands</div></div>
-    </div>
-  </div>
-
 <!-- ════════════════════════════════════════
      APP DISCOVERY 1 — APP INSTALLATION
 ═════════════════════════════════════════ -->
-<div class="content-section active" id="ios-page-app-install">
+<div class="content-section" id="i-page-app-install">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 01</div>
     <h1>App Installation</h1>
@@ -3345,7 +3130,7 @@ scp root@&lt;device_ip&gt;:/var/containers/Bundle/Application/&lt;UUID&gt;/targe
 <!-- ════════════════════════════════════════
      APP DISCOVERY 2 — APP ENVIRONMENT
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-app-env">
+<div class="content-section" id="i-page-app-env">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 02</div>
     <h1>App Environment</h1>
@@ -3418,7 +3203,7 @@ ios file ls /var/mobile/Containers/Data/Application/&lt;UUID&gt;/</code>
 <!-- ════════════════════════════════════════
      APP DISCOVERY 3 — DECRYPT APP
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-decrypt-app">
+<div class="content-section" id="i-page-decrypt-app">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 03</div>
     <h1>Decrypt App</h1>
@@ -3504,7 +3289,7 @@ Clutch2 -d com.target.app
 <!-- ════════════════════════════════════════
      APP DISCOVERY 4 — iOS APP TYPES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-ios-app-types">
+<div class="content-section" id="i-page-ios-app-types">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 04</div>
     <h1>iOS App Types</h1>
@@ -3558,7 +3343,7 @@ otool -L extracted/Payload/TargetApp.app/TargetApp | head -20</code>
 <!-- ════════════════════════════════════════
      APP DISCOVERY 5 — APP PERMISSIONS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-ios-perms">
+<div class="content-section" id="i-page-ios-perms">
   <div class="section-hero">
     <div class="section-hero-eyebrow">App Discovery · Topic 05</div>
     <h1>App Permissions</h1>
@@ -3615,7 +3400,7 @@ sqlite3 /private/var/mobile/Library/TCC/TCC.db \
 <!-- ════════════════════════════════════════
      STATIC 1 — EXTRACT & DECODE IPA
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-extract-ipa">
+<div class="content-section" id="i-page-extract-ipa">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 01</div>
     <h1>Extract and Decode IPA File</h1>
@@ -3693,7 +3478,7 @@ security cms -D -i embedded.mobileprovision | grep -A5 "Entitlements"</code>
 <!-- ════════════════════════════════════════
      STATIC 2 — BINARY PROTECTIONS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-binary-prot">
+<div class="content-section" id="i-page-binary-prot">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 02</div>
     <h1>Binary Protections</h1>
@@ -3763,7 +3548,7 @@ find extracted/Payload/ -type f -exec file {} \; | grep Mach-O | \
 <!-- ════════════════════════════════════════
      STATIC 3 — DATA PROTECTION CLASSES (STATIC)
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-data-prot-static">
+<div class="content-section" id="i-page-data-prot-static">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 03</div>
     <h1>Data Protection Classes — Static Analysis</h1>
@@ -3810,7 +3595,7 @@ strings TargetApp | grep -E "NSFileProtection|kSecAttrAccessible"
 <!-- ════════════════════════════════════════
      STATIC 4 — HEADER FILES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-header-files">
+<div class="content-section" id="i-page-header-files">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 04</div>
     <h1>Evaluate Information from Header Files</h1>
@@ -3881,7 +3666,7 @@ ios hooking watch class AuthManager</code>
 <!-- ════════════════════════════════════════
      STATIC 5 — ENDPOINT DISCOVERY
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-endpoint-disc">
+<div class="content-section" id="i-page-endpoint-disc">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 05</div>
     <h1>Endpoint URL &amp; API Discovery</h1>
@@ -3940,7 +3725,7 @@ strings TargetApp_arm64 | grep -iE \
 <!-- ════════════════════════════════════════
      STATIC 6 — HARDCODED CONFIG
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-hardcoded-static">
+<div class="content-section" id="i-page-hardcoded-static">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 06</div>
     <h1>App Configuration / Hard-Coded Data</h1>
@@ -4006,7 +3791,7 @@ grep -rn "secret\|password\|token\|api_key" \
 <!-- ════════════════════════════════════════
      STATIC 7 — THIRD PARTY LIBRARIES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-thirdparty">
+<div class="content-section" id="i-page-thirdparty">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Static Analysis · Topic 07</div>
     <h1>Third-Party Libraries &amp; Frameworks</h1>
@@ -4054,7 +3839,7 @@ cat Package.resolved | python3 -m json.tool</code>
 <!-- ════════════════════════════════════════
      DYNAMIC 1 — TRANSPORT LAYER SECURITY
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-tls">
+<div class="content-section" id="i-page-tls">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 01</div>
     <h1>Transport Layer Security</h1>
@@ -4106,7 +3891,7 @@ strings TargetApp | grep -i "allowsAnyHTTPS\|trustAllCerts"</code>
 <!-- ════════════════════════════════════════
      DYNAMIC 2 — SENSITIVE DATA DISCLOSURE
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-sensitive-data">
+<div class="content-section" id="i-page-sensitive-data">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 02</div>
     <h1>Sensitive Data Disclosure</h1>
@@ -4178,7 +3963,7 @@ SELECT ZAUTHTOKEN FROM ZAUTHSESSION;</code>
 <!-- ════════════════════════════════════════
      DYNAMIC 3 — HARD-CODED DATA (RUNTIME)
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-hardcoded-dyn">
+<div class="content-section" id="i-page-hardcoded-dyn">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 03</div>
     <h1>Hard-Coded Data — Runtime</h1>
@@ -4225,7 +4010,7 @@ ios nsuserdefaults set --boolean YES --key isAdmin</code>
 <!-- ════════════════════════════════════════
      DYNAMIC 4 — KEYBOARD CACHING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-keyboard-cache">
+<div class="content-section" id="i-page-keyboard-cache">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 04</div>
     <h1>Keyboard Caching</h1>
@@ -4275,7 +4060,7 @@ secureField.spellCheckingType = .no             <span class="cm">// disable spel
 <!-- ════════════════════════════════════════
      DYNAMIC 5 — APPLE SYSTEM LOGS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-asl">
+<div class="content-section" id="i-page-asl">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 05</div>
     <h1>Apple System Logs (ASL)</h1>
@@ -4328,7 +4113,7 @@ grep -rn "NSLog\|os_log\|DDLog\|CocoaLumberjack" headers/</code>
 <!-- ════════════════════════════════════════
      DYNAMIC 6 — iOS BACKUPS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-ios-backup">
+<div class="content-section" id="i-page-ios-backup">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 06</div>
     <h1>iOS Backups</h1>
@@ -4386,7 +4171,7 @@ resourceValues.isExcludedFromBackup = <span class="kw">true</span>
 <!-- ════════════════════════════════════════
      DYNAMIC 7 — iOS LOCAL SERVER
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-local-server">
+<div class="content-section" id="i-page-local-server">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 07</div>
     <h1>iOS Local Server</h1>
@@ -4429,7 +4214,7 @@ frida-trace -U com.target.app -m "*[NSNetService *]" \
 <!-- ════════════════════════════════════════
      DYNAMIC 8 — MEMORY DUMPS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-mem-dumps">
+<div class="content-section" id="i-page-mem-dumps">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 08</div>
     <h1>Memory Dumps</h1>
@@ -4497,7 +4282,7 @@ Process.enumerateRanges(<span class="str">'r--'</span>).forEach(<span class="kw"
 <!-- ════════════════════════════════════════
      DYNAMIC 9 — FILESYSTEM MONITORING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-fs-monitor">
+<div class="content-section" id="i-page-fs-monitor">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 09</div>
     <h1>Filesystem Monitoring</h1>
@@ -4557,7 +4342,7 @@ ObjC.schedule(ObjC.mainQueue, <span class="kw">function</span>() {
 <!-- ════════════════════════════════════════
      DYNAMIC 10 — FUZZING URL SCHEMES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-url-schemes">
+<div class="content-section" id="i-page-url-schemes">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 10</div>
     <h1>Fuzzing Custom URL Schemes</h1>
@@ -4629,7 +4414,7 @@ ObjC.schedule(ObjC.mainQueue, <span class="kw">function</span>() {
 <!-- ════════════════════════════════════════
      DYNAMIC 11 — KEYCHAIN PROTECTION
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-keychain">
+<div class="content-section" id="i-page-keychain">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 11</div>
     <h1>Keychain Protection</h1>
@@ -4689,7 +4474,7 @@ Interceptor.attach(SecItemCopyMatching, {
 <!-- ════════════════════════════════════════
      DYNAMIC 12 — CRYPTO MONITORING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-crypto-monitor">
+<div class="content-section" id="i-page-crypto-monitor">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 12</div>
     <h1>iOS Cryptography Monitoring</h1>
@@ -4746,7 +4531,7 @@ Interceptor.attach(CCCrypt, {
 <!-- ════════════════════════════════════════
      DYNAMIC 13 — DATA PROTECTION (RUNTIME)
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-data-prot-dyn">
+<div class="content-section" id="i-page-data-prot-dyn">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 13</div>
     <h1>Data Protection — Runtime Testing</h1>
@@ -4788,7 +4573,7 @@ ios dataprotection files
 <!-- ════════════════════════════════════════
      DYNAMIC 14 — SESSION COOKIES
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-session-cookies">
+<div class="content-section" id="i-page-session-cookies">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 14</div>
     <h1>Review App Session Cookies</h1>
@@ -4847,7 +4632,7 @@ ObjC.schedule(ObjC.mainQueue, <span class="kw">function</span>() {
 <!-- ════════════════════════════════════════
      DYNAMIC 15 — APP SNAPSHOTS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-app-snapshots">
+<div class="content-section" id="i-page-app-snapshots">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 15</div>
     <h1>App Snapshots</h1>
@@ -4897,7 +4682,7 @@ scp -r root@&lt;ip&gt;:"/var/mobile/Containers/Data/Application/&lt;UUID&gt;/Lib
 <!-- ════════════════════════════════════════
      DYNAMIC 16 — HTTP CACHING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-http-cache">
+<div class="content-section" id="i-page-http-cache">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 16</div>
     <h1>HTTP Caching</h1>
@@ -4947,7 +4732,7 @@ request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData</code>
 <!-- ════════════════════════════════════════
      DYNAMIC 17 — UNIVERSAL LINKS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-universal-links">
+<div class="content-section" id="i-page-universal-links">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 17</div>
     <h1>iOS Universal Links</h1>
@@ -5007,7 +4792,7 @@ xcrun simctl openurl booted "https://example.com/products/123"</code>
 <!-- ════════════════════════════════════════
      DYNAMIC 18 — PASTEBOARD LEAKAGE
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-pasteboard">
+<div class="content-section" id="i-page-pasteboard">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 18</div>
     <h1>Pasteboard Leakage</h1>
@@ -5061,7 +4846,7 @@ ObjC.schedule(ObjC.mainQueue, <span class="kw">function</span>() {
 <!-- ════════════════════════════════════════
      DYNAMIC 19 — BIOMETRICS TESTING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-biometrics">
+<div class="content-section" id="i-page-biometrics">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 19</div>
     <h1>Biometrics Testing</h1>
@@ -5133,7 +4918,7 @@ strings TargetApp | grep "SecAccessControl\|kSecAttrAccessControl"</code>
 <!-- ════════════════════════════════════════
      DYNAMIC 20 — DEBUGGING iOS APPS
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-debugging">
+<div class="content-section" id="i-page-debugging">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Dynamic Analysis · Topic 20</div>
     <h1>Debugging iOS Apps</h1>
@@ -5205,7 +4990,7 @@ Interceptor.replace(ptrace, <span class="kw">new</span> NativeCallback(<span cla
 <!-- ════════════════════════════════════════
      BYPASS 1 — CERTIFICATE PINNING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-cert-pinning">
+<div class="content-section" id="i-page-cert-pinning">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Bypasses · Topic 01</div>
     <h1>Bypass Certificate Pinning</h1>
@@ -5285,7 +5070,7 @@ frida -U Gadget -l bypass-ssl-pinning.js</code>
 <!-- ════════════════════════════════════════
      BYPASS 2 — JAILBREAK DETECTION
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-jb-detect">
+<div class="content-section" id="i-page-jb-detect">
   <div class="section-hero">
     <div class="section-hero-eyebrow">Bypasses · Topic 02</div>
     <h1>Bypass Jailbreak Detection</h1>
@@ -5383,7 +5168,7 @@ objection patchipa --source target.ipa
 <!-- ════════════════════════════════════════
      HTTP 1 — CONFIGURE INTERCEPT PROXY
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-proxy">
+<div class="content-section" id="i-page-proxy">
   <div class="section-hero">
     <div class="section-hero-eyebrow">HTTP Traffic · Topic 01</div>
     <h1>Configure an Intercept Proxy</h1>
@@ -5434,7 +5219,7 @@ iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT \
 <!-- ════════════════════════════════════════
      HTTP 2 — WEB APP BACKEND TESTING
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-web-backend">
+<div class="content-section" id="i-page-web-backend">
   <div class="section-hero">
     <div class="section-hero-eyebrow">HTTP Traffic · Topic 02</div>
     <h1>Web Application Backend Testing</h1>
@@ -5514,7 +5299,7 @@ POST /api/v1/verify-otp
 <!-- ════════════════════════════════════════
      HTTP 3 — FLEXible
 ═════════════════════════════════════════ -->
-<div class="content-section" id="ios-page-flexible">
+<div class="content-section" id="i-page-flexible">
   <div class="section-hero">
     <div class="section-hero-eyebrow">HTTP Traffic · Topic 03</div>
     <h1>Using FLEXible to Record HTTP Communications</h1>
@@ -5593,126 +5378,124 @@ zip -r patched.ipa extracted/Payload/
 ideviceinstaller -i patched.ipa</code>
   </pre>
 </div>
-
-
   </div>
 
 </main>
 
 <script>
-var currentPlatform = 'and';
-var currentPage = { and: 'methodology', ios: 'methodology' };
+var P = 'a';
 
-function switchPlatform(plat) {
-  currentPlatform = plat;
+function nav(p, id) {
+  P = p;
+  var isA = (p === 'a');
 
-  // Update body class for CSS variable switching
-  document.body.classList.toggle('ios-mode', plat === 'ios');
+  // Theme
+  document.body.className = isA ? '' : 'ios';
 
-  // Platform switcher buttons
-  document.getElementById('btn-android').classList.toggle('active', plat === 'android');
-  document.getElementById('btn-ios').classList.toggle('active', plat === 'ios');
+  // Buttons
+  document.getElementById('btn-a').className = isA ? 'pb on' : 'pb';
+  document.getElementById('btn-i').className = isA ? 'pb' : 'pb on';
 
-  // Show correct nav
-  document.getElementById('and-nav-root').classList.toggle('active', plat === 'android');
-  document.getElementById('ios-nav-root').classList.toggle('active', plat === 'ios');
+  // Navs
+  document.getElementById('nav-a').className = isA ? 'nav-scroll on' : 'nav-scroll';
+  document.getElementById('nav-i').className = isA ? 'nav-scroll' : 'nav-scroll on';
 
-  // Show correct content view
-  document.getElementById('and-view').classList.toggle('active', plat === 'android');
-  document.getElementById('ios-view').classList.toggle('active', plat === 'ios');
-  document.getElementById('welcome').style.display = 'none';
+  // Platform views — hide both, show the right one
+  document.getElementById('pv-a').className = isA ? 'pv on' : 'pv';
+  document.getElementById('pv-i').className = isA ? 'pv' : 'pv on';
 
-  // Update sidebar branding
-  var p = plat === 'android';
-  document.getElementById('sidebar-logo-icon').className = 'logo-icon ' + (p ? 'android-logo' : 'ios-logo');
-  document.getElementById('sidebar-logo-icon').textContent = p ? '🤖' : '🍎';
-  document.getElementById('sidebar-subtitle').textContent = 'Mobile Security · ' + (p ? 'Android' : 'iOS') + ' Edition';
-  document.getElementById('sidebar-badge').textContent = 'v1.0 · ' + (p ? 'Android · 31 Topics' : 'iOS · 37 Topics');
-  document.getElementById('bc-plat').textContent = p ? 'Android' : 'iOS';
+  // Sidebar branding
+  var li = document.getElementById('li');
+  li.className = isA ? 'li al' : 'li il';
+  li.innerHTML = isA ? '&#129302;' : '&#127822;';
+  document.getElementById('sb-sub').textContent = 'Mobile Security · ' + (isA ? 'Android' : 'iOS') + ' Edition';
+  document.getElementById('sb-badge').textContent = 'v1.0 · ' + (isA ? 'Android · 32 Topics' : 'iOS · 38 Topics');
+  document.getElementById('bc-plat').textContent = isA ? 'Android' : 'iOS';
 
-  // Show current page for this platform
-  showPageInner(plat === 'android' ? 'and' : 'ios', currentPage[plat === 'android' ? 'and' : 'ios']);
-}
-
-function showPage(plat, id) {
-  if (plat !== currentPlatform.replace('oid','')) {
-    // also handles 'and' vs 'android'
+  // Hide all sections in the active view, then show target
+  var view = document.getElementById('pv-' + p);
+  var secs = view.getElementsByClassName('content-section');
+  for (var j = 0; j < secs.length; j++) {
+    secs[j].className = 'content-section';
   }
-  showPageInner(plat, id);
-}
-
-function showPageInner(plat, id) {
-  currentPage[plat] = id;
-  var prefix = plat + '-page-';
-
-  // Hide all sections in this platform view
-  document.querySelectorAll('#' + plat + '-view .content-section').forEach(s => s.classList.remove('active'));
-
-  var page = document.getElementById(prefix + id);
-  if (page) page.classList.add('active');
-
-  // Update nav active states
-  var navRoot = document.getElementById(plat + '-nav-root');
-  if (navRoot) {
-    navRoot.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    navRoot.querySelectorAll('.nav-item').forEach(item => {
-      var oc = item.getAttribute('onclick') || '';
-      if (oc.includes("'" + id + "'")) item.classList.add('active');
-    });
+  var target = document.getElementById(p + '-page-' + id);
+  if (target) {
+    target.className = 'content-section on';
   }
 
-  // Update breadcrumb
-  var activeItem = document.querySelector('#' + plat + '-nav-root .nav-item.active');
-  document.getElementById('bc-current').textContent = activeItem ? activeItem.textContent.trim() : id;
-
-  updateProgress(plat);
-  document.getElementById('main').scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function toggleSection(header, plat) {
-  var section = header.parentElement;
-  var navRoot = plat ? document.getElementById(plat + '-nav-root') : header.closest('.nav-scroll');
-  if (navRoot) {
-    navRoot.querySelectorAll('.nav-section').forEach(s => { if (s !== section) s.classList.remove('open'); });
-    navRoot.querySelectorAll('.nav-section-header').forEach(h => { if (h !== header) h.classList.remove('active'); });
+  // Nav highlight
+  var navEl = document.getElementById('nav-' + p);
+  var items = navEl.getElementsByClassName('nav-item');
+  for (var k = 0; k < items.length; k++) {
+    items[k].className = 'nav-item';
   }
-  section.classList.toggle('open');
-  if (section.classList.contains('open')) header.classList.add('active');
-  else header.classList.remove('active');
+  var q = "'" + id + "'";
+  for (var m = 0; m < items.length; m++) {
+    if ((items[m].getAttribute('onclick') || '').indexOf(q) > -1) {
+      items[m].className = 'nav-item on';
+      break;
+    }
+  }
+
+  // Breadcrumb
+  var act = navEl.querySelector('.nav-item.on');
+  document.getElementById('bc-cur').textContent = act ? act.textContent.trim() : id;
+
+  // Progress
+  var allSecs = view.getElementsByClassName('content-section');
+  var allIds = [];
+  for (var n = 0; n < allSecs.length; n++) {
+    allIds.push(allSecs[n].id.replace(p + '-page-', ''));
+  }
+  var idx = allIds.indexOf(id);
+  document.getElementById('prog').style.width = (idx >= 0 ? (idx + 1) / allIds.length * 100 : 0) + '%';
+
+  // Scroll top
+  document.getElementById('main').scrollTop = 0;
 }
 
-function updateProgress(plat) {
-  var all = document.querySelectorAll('#' + plat + '-view .content-section');
-  var allIds = Array.from(all).map(s => s.id.replace(plat + '-page-', ''));
-  var idx = allIds.indexOf(currentPage[plat]);
-  var pct = ((idx + 1) / allIds.length) * 100;
-  document.getElementById('progress-fill').style.width = pct + '%';
+function sw(p) { nav(p, 'methodology'); }
+
+function tog(hdr, p) {
+  var sec = hdr.parentElement;
+  var navEl = document.getElementById('nav-' + p);
+  var secs = navEl.getElementsByClassName('nav-section');
+  var hdrs = navEl.getElementsByClassName('nav-section-header');
+  for (var j = 0; j < secs.length; j++) {
+    if (secs[j] !== sec) secs[j].classList.remove('open');
+  }
+  for (var k = 0; k < hdrs.length; k++) {
+    if (hdrs[k] !== hdr) hdrs[k].classList.remove('on');
+  }
+  sec.classList.toggle('open');
+  hdr.classList.toggle('on', sec.classList.contains('open'));
+}
+
+function search(q) {
+  q = q.toLowerCase();
+  var navEl = document.getElementById('nav-' + P);
+  var items = navEl.getElementsByClassName('nav-item');
+  for (var j = 0; j < items.length; j++) {
+    var t = items[j].textContent.toLowerCase();
+    var k = (items[j].dataset.keywords || '').toLowerCase();
+    items[j].style.display = (!q || t.indexOf(q) > -1 || k.indexOf(q) > -1) ? '' : 'none';
+  }
+  if (q) {
+    var secs = navEl.getElementsByClassName('nav-section');
+    for (var m = 0; m < secs.length; m++) secs[m].classList.add('open');
+  }
 }
 
 function copyPre(btn) {
   var code = btn.closest('pre').querySelector('code');
-  navigator.clipboard.writeText(code.innerText).then(() => {
+  navigator.clipboard.writeText(code.innerText).then(function() {
     btn.textContent = 'copied!';
-    setTimeout(() => btn.textContent = 'copy', 1500);
+    setTimeout(function() { btn.textContent = 'copy'; }, 1500);
   });
 }
 
-function filterNav(query) {
-  var q = query.toLowerCase();
-  var activeNav = document.getElementById(currentPlatform + '-nav-root') ||
-                  document.getElementById('and-nav-root');
-  activeNav.querySelectorAll('.nav-item').forEach(item => {
-    var text = item.textContent.toLowerCase();
-    var kw = (item.dataset.keywords || '').toLowerCase();
-    item.style.display = (!q || text.includes(q) || kw.includes(q)) ? '' : 'none';
-  });
-  if (q) activeNav.querySelectorAll('.nav-section').forEach(s => s.classList.add('open'));
-}
-
-// Remap currentPlatform to prefix
-Object.defineProperty(window, 'currentPlatformPrefix', {
-  get: function() { return currentPlatform; }
-});
+// Initialise
+nav('a', 'methodology');
 </script>
 </body>
 </html>
